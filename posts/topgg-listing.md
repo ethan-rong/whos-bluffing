@@ -9,7 +9,7 @@ Existing application checked October 9, 2026: still in review. Update the existi
 - Invite: https://discord.com/oauth2/authorize?client_id=1556371051439587461&scope=bot+applications.commands&permissions=83968&integration_type=0
 - Website: https://whosbluffing.com/discord
 - Support server: https://discord.gg/V5wcSC7cd
-- Repository: https://github.com/rongtnt/whos-bluffing
+- Repository: https://github.com/ethan-rong/whos-bluffing
 - Privacy: https://whosbluffing.com/privacy
 - Categories: Education, Fun, Game, Level/Rank/Leaderboard, quiz, Social, trivia
 - Language: English
@@ -47,7 +47,7 @@ An admin can use `/bluff setup` to put a daily question in a channel. Everyone a
 
 Free. No ads. You can also [try it in your browser](https://whosbluffing.com/) without making an account.
 
-[How it works](https://whosbluffing.com/discord) · [Privacy](https://whosbluffing.com/privacy) · [Report a bug](https://github.com/rongtnt/whos-bluffing/issues)
+[How it works](https://whosbluffing.com/discord) · [Privacy](https://whosbluffing.com/privacy) · [Report a bug](https://github.com/ethan-rong/whos-bluffing/issues)
 
 ## Reviewer testing instructions
 

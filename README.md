@@ -13,7 +13,7 @@
   <a href="https://whosbluffing.com"><img alt="Play" src="https://img.shields.io/badge/play-whosbluffing.com-2F5BFF?style=flat-square"></a>
   <a href="https://whosbluffing.com/discord"><img alt="Discord app" src="https://img.shields.io/badge/discord-app-5865F2?style=flat-square"></a>
   <a href="https://whosbluffing.com/slack"><img alt="Slack app" src="https://img.shields.io/badge/slack-app-4A154B?style=flat-square"></a>
-  <a href="https://github.com/rongtnt/whos-bluffing/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/rongtnt/whos-bluffing/actions/workflows/ci.yml/badge.svg"></a>
+  <a href="https://github.com/ethan-rong/whos-bluffing/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/ethan-rong/whos-bluffing/actions/workflows/ci.yml/badge.svg"></a>
   <a href="LICENSE"><img alt="Licence" src="https://img.shields.io/badge/source-published-111827?style=flat-square"></a>
 </p>
 

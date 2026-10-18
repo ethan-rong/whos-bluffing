@@ -208,7 +208,7 @@ test('share text: the pack after the name unless it is All; the best line under 
 });
 
 test('licence wording: the new footer line everywhere; no "open source" in web copy except the terms\' negation', () => {
-  const line = '<p class="foot-note">An independent, non-commercial project. Source published for transparency; all rights reserved (see <a href="https://github.com/rongtnt/whos-bluffing/blob/main/LICENSE">LICENSE on GitHub</a>).</p>';
+  const line = '<p class="foot-note">An independent, non-commercial project. Source published for transparency; all rights reserved (see <a href="https://github.com/ethan-rong/whos-bluffing/blob/main/LICENSE">LICENSE on GitHub</a>).</p>';
   const pages = readdirSync(new URL('public/', WEB), { recursive: true }).filter((f) => f.endsWith('.html'));
   for (const f of pages) {
     const h = read(`public/${f}`);

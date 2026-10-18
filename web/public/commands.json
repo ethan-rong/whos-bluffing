@@ -73,7 +73,7 @@
       },
       {
         "q": "The server leaderboard says “a member” instead of names",
-        "a": "The `/bluff stats` leaderboard looks up server members. If everyone shows as “a member”, please [tell us on GitHub](https://github.com/rongtnt/whos-bluffing/issues). Only the first 1,000 members of a server can be named. Friend rounds use the display name you share when joining instead."
+        "a": "The `/bluff stats` leaderboard looks up server members. If everyone shows as “a member”, please [tell us on GitHub](https://github.com/ethan-rong/whos-bluffing/issues). Only the first 1,000 members of a server can be named. Friend rounds use the display name you share when joining instead."
       },
       {
         "q": "“This interaction failed”",

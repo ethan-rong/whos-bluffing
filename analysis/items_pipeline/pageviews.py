@@ -25,7 +25,7 @@ import urllib.parse
 import urllib.request
 
 ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
-USER_AGENT = "WhosBluffingItemPipeline/1.0 (https://github.com/rongtnt/whos-bluffing; familiarity of quiz items by pageviews)"
+USER_AGENT = "WhosBluffingItemPipeline/1.0 (https://github.com/ethan-rong/whos-bluffing; familiarity of quiz items by pageviews)"
 WIKIDATA_API = "https://www.wikidata.org/w/api.php"
 PAGEVIEWS = "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia/all-access/user/{title}/monthly/{start}/{end}"
 MONTHS = 3

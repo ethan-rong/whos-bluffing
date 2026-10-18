@@ -10,7 +10,7 @@ not split. Claims that must stay true: "source published" (repo public from Mon 
 - Invite: `https://discord.com/oauth2/authorize?client_id=1556371051439587461&scope=bot+applications.commands&permissions=83968&integration_type=0`
 - Website: `https://whosbluffing.com/discord`
 - Support server: `https://discord.gg/V5wcSC7cd`
-- GitHub: `https://github.com/rongtnt/whos-bluffing` (`rongtnt` if you skipped the username change in `USER_TODO.md` B1)
+- GitHub: `https://github.com/ethan-rong/whos-bluffing` (`ethan-rong` if you skipped the username change in `USER_TODO.md` B1)
 - Tags (pick from their list): Fun · Games · Social · Education
 
 ## Short description (99 characters)

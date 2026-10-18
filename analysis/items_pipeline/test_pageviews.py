@@ -64,7 +64,7 @@ class Pageviews(unittest.TestCase):
         self.assertEqual(pv.fetch_titles(["Q3392", "Q3123", "Q3392"], get=get)["Q3123"], "Io (moon)")
         self.assertEqual(sum("wbgetentities" in c for c in calls), 1)  # one call for up to 50 ids
         self.assertEqual(pv.fetch_views(["Nile", "Nowhere"], *WINDOW, get=get), {"Nile": 75236, "Nowhere": 0})
-        self.assertIn("rongtnt/whos-bluffing", pv.USER_AGENT)
+        self.assertIn("ethan-rong/whos-bluffing", pv.USER_AGENT)
 
     def test_a_cache_fetches_only_what_it_lacks_and_keeps_it(self):
         with tempfile.TemporaryDirectory() as tmp:

@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = new URL('../../', import.meta.url);
 const WEB = new URL('../', import.meta.url);
-const REPO = 'https://github.com/rongtnt/whos-bluffing/blob/main/';
+const REPO = 'https://github.com/ethan-rong/whos-bluffing/blob/main/';
 
 export const DOCS = [
   { src: ['PRIVACY.md'], out: 'public/privacy.html', path: '/privacy', title: "Privacy | Who's Bluffing?",

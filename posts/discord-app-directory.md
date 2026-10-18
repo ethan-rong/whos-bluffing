@@ -63,7 +63,7 @@ Help and feedback: our community server (link below).
   picker, reveal), taken on Tue Oct 6.
 - Support server: the community server invite (block B in `docs/GROWTH_PLAYBOOK.md`)
 - Links: Website `https://whosbluffing.com/discord` · Terms `https://whosbluffing.com/terms` ·
-  Privacy `https://whosbluffing.com/privacy` · GitHub `https://github.com/rongtnt/whos-bluffing` (`rongtnt` if you
+  Privacy `https://whosbluffing.com/privacy` · GitHub `https://github.com/ethan-rong/whos-bluffing` (`ethan-rong` if you
   skipped the username change in `USER_TODO.md` B1)
 
 ## Server Members Intent: reason to paste at verification

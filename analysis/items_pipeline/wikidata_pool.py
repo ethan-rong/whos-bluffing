@@ -39,7 +39,7 @@ import urllib.parse
 import urllib.request
 
 ENDPOINT = "https://query.wikidata.org/sparql"
-USER_AGENT = "WhosBluffingItemPipeline/1.0 (https://github.com/rongtnt/whos-bluffing)"
+USER_AGENT = "WhosBluffingItemPipeline/1.0 (https://github.com/ethan-rong/whos-bluffing)"
 ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 WD = "http://www.wikidata.org/entity/"
 LABEL = 'SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }'

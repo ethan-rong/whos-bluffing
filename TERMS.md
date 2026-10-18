@@ -37,7 +37,7 @@ A teacher who creates a class code, or a member who installs the Slack app, shou
 
 ## Source and licence
 
-The source code is published on [GitHub](https://github.com/rongtnt/whos-bluffing) so that anyone can read it and verify the research. It is not open source: all rights are reserved, and no permission is granted to use, copy, modify or redistribute it, except to run it locally to verify published results (see the LICENSE file). Published datasets are licensed under CC BY-NC 4.0. Questions are built from Wikidata and official sources, each linked from the question.
+The source code is published on [GitHub](https://github.com/ethan-rong/whos-bluffing) so that anyone can read it and verify the research. It is not open source: all rights are reserved, and no permission is granted to use, copy, modify or redistribute it, except to run it locally to verify published results (see the LICENSE file). Published datasets are licensed under CC BY-NC 4.0. Questions are built from Wikidata and official sources, each linked from the question.
 
 ## Changes
 
@@ -45,4 +45,4 @@ We may update these terms. The date at the top shows the current version; using 
 
 ## Contact
 
-Questions or problems: open an issue on [GitHub](https://github.com/rongtnt/whos-bluffing/issues).
+Questions or problems: open an issue on [GitHub](https://github.com/ethan-rong/whos-bluffing/issues).

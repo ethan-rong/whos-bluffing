@@ -168,7 +168,7 @@ The twist: it does not just count right answers. Your results show how sure you 
 Why it exists: the hypotheses were frozen before launch, and the anonymous answers will be released as open data. Nothing is saved unless you submit at the end, and no account, email or IP address is stored.
 
 Test: https://whosbluffing.com/test
-Pre-registration: https://github.com/rongtnt/whos-bluffing/blob/main/prereg/PREREG.md
+Pre-registration: https://github.com/ethan-rong/whos-bluffing/blob/main/prereg/PREREG.md
 
 I plan to share the results here when there is enough data. Comments on unclear questions are welcome.
 ```

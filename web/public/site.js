@@ -7,10 +7,10 @@ const SLACK_INSTALL_URL = 'https://whosbluffing-slack.rongaijun41.workers.dev/sl
 const DISCORD_INSTALL_URL = 'https://discord.com/oauth2/authorize?client_id=1556371051439587461&scope=bot%20applications.commands&permissions=83968&integration_type=0'; // server install; matches the Discord Worker's /install
 const DISCORD_USER_INSTALL_URL = 'https://discord.com/oauth2/authorize?client_id=1556371051439587461&scope=applications.commands&integration_type=1'; // personal commands only; no server permissions
 const CONTACT_EMAIL = 'hello@whosbluffing.com'; // e.g. hello@whosbluffing.com once email routing works (hidden until set)
-const GITHUB_URL = 'https://github.com/rongtnt/whos-bluffing';
+const GITHUB_URL = 'https://github.com/ethan-rong/whos-bluffing';
 const X_URL = 'https://x.com/whos_bluffing'; // e.g. https://x.com/<handle>
 const BLUESKY_URL = ''; // e.g. https://bsky.app/profile/<handle>
-const ACTIONS_URL = 'https://github.com/rongtnt/whos-bluffing/actions'; // the repository's GitHub Actions page, once the repository is public (/status links to it)
+const ACTIONS_URL = 'https://github.com/ethan-rong/whos-bluffing/actions'; // the repository's GitHub Actions page, once the repository is public (/status links to it)
 
 (() => {
   const root = document.documentElement;

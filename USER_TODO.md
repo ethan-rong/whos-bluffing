@@ -13,7 +13,7 @@
    推上去后 GitHub Actions 自动跑 `scripts/check.sh`。
 3. 仓库改公开（建议发帖前做，不是现在也行）：
    ```bash
-   gh repo edit rongtnt/whos-bluffing --visibility public --accept-visibility-change-consequences
+   gh repo edit ethan-rong/whos-bluffing --visibility public --accept-visibility-change-consequences
    ```
 
 ## B. GitHub 形象（5 分钟）
