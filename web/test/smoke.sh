@@ -104,7 +104,7 @@ done
 # content PATH TEXT LABEL: 200 and the page's own text (a page can only be told apart from another by its content).
 content() { req GET "$1"; [ "$STATUS" = 200 ] && [[ "$BODY" == *"$2"* ]] || fail "GET $1 should contain '$2' (status $STATUS)" "$BODY"; pass "GET $1 -> $3"; }
 content / 'id="play"' 'home with the Play button'
-content / '<button type="button" data-surface="discord" aria-pressed="true">Discord</button>' 'home: the Discord · Slack · Web switch over the mocks'
+content / '<button type="button" data-surface="web" aria-pressed="true">Web</button>' 'home: the Web preview is selected initially'
 content / '<ul class="prompts-list" aria-hidden="true">' 'home: the question list, twice for its loop (sync-pages.js)'
 content /stats '>Total Players</h1>' 'stats: total players'
 content /status 'class="player-count" data-player-count' 'status: centered total'
