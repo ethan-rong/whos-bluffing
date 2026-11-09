@@ -942,8 +942,7 @@ h3 { margin-top: 20px; }
 .lab-table .is-mine > * { background: var(--accent-soft); }
 .lab-you { color: var(--accent); font-size: var(--fs-6); font-weight: 700; }
 .lab-need { color: var(--muted); }
-/* /parties' longest side name ("Independents"): tighter cells fit a 375 px phone; on a narrower one the table scrolls,
-   never the page. */
+/* Tighter cells fit the board on a 375 px phone; on a narrower one the table scrolls, never the page. */
 .lab-board { overflow-x: auto; }
 @media (max-width: 400px) { .lab-table th, .lab-table td { padding-inline: 3px; } }
 

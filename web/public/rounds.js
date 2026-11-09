@@ -4,7 +4,7 @@
 // Scoring is server-side (docs/api-rounds.md). Local state: whosbluffing_anon (ui.js), whosbluffing_seen_pairs (the newest 300 pair ids
 // played; the server keeps the last 300 it is sent), whosbluffing_round (the round in progress, so a reload resumes),
 // whosbluffing_nick (optional name for challenge links), whosbluffing_dares ({round_id: score} of finished dares);
-// pack and difficulty in picker.js, the side after AI and Politics rounds (whosbluffing_lab, whosbluffing_party) in
+// pack and difficulty in picker.js, the lab after AI rounds (whosbluffing_lab) in
 // round-end.js, sound in site.js.
 import { html, api, store, anonId, calibrationChart, chartLabels, signed } from './ui.js';
 import { bins } from './metrics.js';

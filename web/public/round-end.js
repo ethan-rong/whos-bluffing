@@ -67,9 +67,9 @@ export function wireGrid(root, st, t) {
 }
 
 // --- after an AI or Politics round: "Which lab are you with?" / "Which side are you on?" ----------------------------
-// One chip per side of the pack's board (packs.js BOARDS: labs for AI, parties for Politics); a tap claims the round for
+// One chip per side of the pack's board (packs.js BOARDS: labs for AI); a tap claims the round for
 // that side (POST /api/round/<key>), presses the chip and shows the mini board. The side is kept in this browser
-// (whosbluffing_lab, whosbluffing_party) and later rounds of that pack claim it at once, showing "You're with {lab}" or
+// (whosbluffing_lab) and later rounds of that pack claim it at once, showing "You're with {lab}" or
 // "Your side: {side}" and "change". Quick rounds only: a challenge round loads as pack All, and a dare round is not a
 // quick round (the API refuses it). board = the body of GET /api/<list>: {min_players, <list>: [{<key>, name, players,
 // mean_score, mean_overconfidence}]}. Both boards use the lab-* class names (styles.css).

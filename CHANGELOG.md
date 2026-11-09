@@ -2,6 +2,10 @@
 
 Deviations from `prereg/PREREG.md` after it is finalized are logged here with a date and a reason.
 
+## 2026-11-09 (site redesign; party board removed)
+- New type, layout and colours across the site; the brand mark, palette, scoring, questions and game flow are unchanged.
+- Removed the `/parties` page and the "Which side are you on?" claim after Politics rounds (`GET /api/parties`, `POST /api/round/party`). Earlier claims stay stored. The Politics pack and the AI lab board are unchanged.
+
 ## 2026-10-09 (native chat rounds)
 - Slack gains full ten-question solo and shared rounds. Both chat apps offer the web's supported topics and difficulties, source-linked feedback, friend challenges and fresh rematches. Question selection and confidence scoring use the existing game API; no scoring thresholds changed.
 - Completed native rounds are recorded with their Slack or Discord surface. Shared party sessions are not web friend-challenge conversions. Temporary party display names are stored only after a member explicitly joins and agrees to share their name and final score; names are not sent to the research API.

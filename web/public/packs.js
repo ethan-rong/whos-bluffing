@@ -40,16 +40,14 @@ export const DEFAULT_DIFFICULTY = 'normal';
 export const packLabel = (pack) => PACKS[pack]?.label ?? PACKS.all.label;
 export const difficultyLabel = (d) => DIFFICULTY_LABELS[d] ?? DIFFICULTY_LABELS.normal;
 
-// The labs a player of an AI-pack round can say they are with, and the sides a player of a Politics round can say they
-// are on, in board order for ties: id -> display name. The ids of all boards are distinct (lab_agg is keyed by them).
+// The labs a player of an AI-pack round can say they are with, in board order for ties: id -> display name. The ids of
+// all boards are distinct (lab_agg is keyed by them).
 export const LABS = { openai: 'OpenAI', anthropic: 'Anthropic', google: 'Google', xai: 'xAI', meta: 'Meta', other: 'Other' };
-export const PARTIES = { democrat: 'Democrats', republican: 'Republicans', independent: 'Independents', none: 'No side' };
 
-// One self-reported board per pack that has one (functions/_labs.js, the end screen, /labs and /parties). `key` names
+// One self-reported board per pack that has one (functions/_labs.js, the end screen, /labs). `key` names
 // the claim's field and route (POST /api/round/<key> {<key>}), `list` the board (GET /api/<list>, the page /<list>, the
 // strings under <list> in i18n/en.json, the `board` column of lab_claims and lab_agg); `play` = the page's Play button
 // difficulty; `share`: the share text gains "I'm with {side}. {side} averages {score} ..." (labs only).
 export const BOARDS = {
   ai: { key: 'lab', list: 'labs', sides: LABS, play: 'brutal', share: true },
-  politics: { key: 'party', list: 'parties', sides: PARTIES, play: 'normal', share: false },
 };

@@ -1,16 +1,15 @@
-// Side boards on a real SQLite database (test/d1.js) with a small fixture of AI, river and Politics pairs: lab claims
-// (POST /api/round/lab, GET /api/labs) and party claims (POST /api/round/party, GET /api/parties; docs/api-rounds.md):
-// validation, the aggregates, a moved claim, the board's order and its hidden averages, the boards kept apart, and the
-// end screen's block, table and share line. HTTP wiring is covered by test/smoke.sh.
+// The AI pack's side board on a real SQLite database (test/d1.js) with a small fixture of AI, river and Politics pairs:
+// lab claims (POST /api/round/lab, GET /api/labs; docs/api-rounds.md): validation, the aggregates, a moved claim, the
+// board's order and its hidden averages, and the end screen's block, table and share line. HTTP wiring is covered by test/smoke.sh.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { openD1 } from './d1.js';
 import { addDays } from '../functions/_daily.js';
 import { loadRounds, answer, complete } from '../functions/_rounds.js';
 import { claimSide, sideBoard, boardBody } from '../functions/_labs.js';
 import { boardOf, sideBlock, sideTable, sideShareLine, withSideLine, overWords } from '../public/round-end.js';
-import { LABS, PARTIES, BOARDS } from '../public/packs.js';
+import { LABS, BOARDS } from '../public/packs.js';
 
 const CATS = [
   { category: 'ai_timeline', unit: 'month', prompt: 'Which came first?', more: 'came first', less: 'came later', value: (k) => 202001 + k },
@@ -28,7 +27,6 @@ const pairs = CATS.flatMap((c, ci) => Array.from({ length: PER - 1 }, (_, k) => 
 const DATA = loadRounds({ items }, { templates: CATS.map(({ value, ...t }) => t), pairs }, {});
 const AI = ['p00001', 'p00002', 'p00003', 'p00004', 'p00005'];
 const RIVER = ['p00006', 'p00007', 'p00008'];
-const POL = ['p00011', 'p00012', 'p00013', 'p00014', 'p00015'];
 const DAY = '2026-11-10';
 const NOW = new Date(`${DAY}T12:00:00Z`);
 const NOT_AI = 'only quick rounds in the AI pack can be claimed';
@@ -45,7 +43,6 @@ const addPlay = (db, id, who, score, overconf, day = DAY) => db.prepare(`INSERT 
   mean_conf, overconf, brier, type, public_token, completed_at, day, mode) VALUES (?, ?, 'web', ?, 50, 60, ?, 0.25, 'Bluffer', ?, ?, ?, 'quick')`)
   .bind(anon(who), id, score, overconf, `${id}-${who}`, NOW.toISOString(), day).run();
 const claim = (db, k, lab) => claimSide(db, DATA, 'ai', { round_id: rid(k), anon_id: anon(k), lab }, NOW);
-const claimParty = (db, k, party) => claimSide(db, DATA, 'politics', { round_id: rid(k), anon_id: anon(k), party }, NOW);
 
 // lab_agg must equal the sums over lab_claims (rows a moved claim left at zero aside).
 function assertAggIsClaims(db) {
@@ -205,79 +202,16 @@ test('end screen: the lab block, the mini and full board, the share line before 
   assert.equal(withSideLine('text', null, url), 'text');
 });
 
-// --- the Politics pack's board: party claims ---------------------------------------------------------------------------
-const NOT_POL = 'only quick rounds in the Politics pack can be claimed';
-const BAD_PARTY = 'party must be democrat, republican, independent or none';
-
-test('parties: a claim after a Politics round; each board refuses the other pack\'s rounds; the boards stay apart', async () => {
-  const db = openD1();
-  await addRound(db, rid(1), POL);
-  await addRound(db, rid(2), AI);
-  await addRound(db, rid(3), [...POL.slice(0, 4), RIVER[0]]);
-  for (const k of [1, 2, 3]) await addPlay(db, rid(k), k, 120, 12.5);
-  const body = (x) => ({ round_id: rid(1), anon_id: anon(1), party: 'independent', ...x });
-  for (const [b, status, error] of [
-    [body({ round_id: rid(2), anon_id: anon(2) }), 400, NOT_POL], // an AI round
-    [body({ round_id: rid(3), anon_id: anon(3) }), 400, NOT_POL], // four Politics pairs and one river pair
-    [body({ round_id: 'rk-2026-11-10' }), 400, NOT_POL],
-    [body({ round_id: 'dr-cruz' }), 400, NOT_POL], // a dare round is not a quick round
-    [body({ party: 'green' }), 400, BAD_PARTY],
-    [body({ party: 'toString' }), 400, BAD_PARTY],
-    [{ round_id: rid(1), anon_id: anon(1), lab: 'openai' }, 400, BAD_PARTY],
-  ]) assert.deepEqual(await claimSide(db, DATA, 'politics', b, NOW), { status, body: { error } }, JSON.stringify(b));
-  assert.deepEqual(await claimSide(db, DATA, 'ai', { round_id: rid(1), anon_id: anon(1), lab: 'openai' }, NOW),
-    { status: 400, body: { error: 'only quick rounds in the AI pack can be claimed' } });
-  const r = await claimParty(db, 1, 'independent');
-  assert.equal(r.status, 200);
-  assert.deepEqual(Object.keys(r.body), ['ok', 'party', 'board']);
-  assert.deepEqual(Object.keys(r.body.board), ['as_of', 'range', 'min_players', 'parties']);
-  assert.deepEqual(r.body.board.parties.map((e) => [e.party, e.name, e.players]),
-    [['independent', 'Independents', 1], ['democrat', 'Democrats', 0], ['republican', 'Republicans', 0], ['none', 'No side', 0]]);
-  assert.deepEqual(Object.keys(r.body.board.parties[0]), ['party', 'name', 'players', 'mean_score', 'mean_overconfidence']);
-  assert.equal((await claim(db, 2, 'meta')).status, 200);
-  assert.deepEqual(rows(db, 'SELECT round_id, board, lab FROM lab_claims ORDER BY 1'), [{ round_id: rid(1), board: 'parties', lab: 'independent' },
-    { round_id: rid(2), board: 'labs', lab: 'meta' }]);
-  const labs = (await sideBoard(db, 'ai', 'all', NOW)).body;
-  const parties = (await sideBoard(db, 'politics', 'all', NOW)).body;
-  assert.deepEqual([labs.labs.map((e) => e.lab), labs.labs[0].players], [['meta', 'openai', 'anthropic', 'google', 'xai', 'other'], 1]);
-  assert.deepEqual(parties.parties.map((e) => [e.party, e.players]), [['independent', 1], ['democrat', 0], ['republican', 0], ['none', 0]]);
-  const moved = await claimParty(db, 1, 'none');
-  assert.deepEqual(moved.body.board.parties.map((e) => [e.party, e.players]), [['none', 1], ['democrat', 0], ['republican', 0], ['independent', 0]]);
-  assertAggIsClaims(db);
-  assert.deepEqual(rows(db, "SELECT board, lab, players FROM lab_agg WHERE players > 0 ORDER BY 1"), [{ board: 'labs', lab: 'meta', players: 1 },
-    { board: 'parties', lab: 'none', players: 1 }]);
+test('boards: one board, the AI pack\'s; the Politics party board and the /parties page are gone', () => {
+  assert.deepEqual(Object.keys(BOARDS), ['ai']);
+  assert.deepEqual([BOARDS.ai.key, BOARDS.ai.list, BOARDS.ai.sides], ['lab', 'labs', LABS]);
+  for (const f of ['public/parties.html', 'functions/api/parties.js', 'functions/api/round/party.js']) assert.ok(!existsSync(new URL(`../${f}`, import.meta.url)), f);
+  const pages = readdirSync(new URL('../public/', import.meta.url), { recursive: true }).filter((f) => f.endsWith('.html'));
+  for (const f of pages) assert.doesNotMatch(readFileSync(new URL(`../public/${f}`, import.meta.url), 'utf8'), /href="\/parties"/, f);
 });
 
-test('boards: the side ids of every board are distinct (lab_agg is keyed by side, day and difficulty), one board per pack', () => {
-  const ids = Object.values(BOARDS).flatMap((b) => Object.keys(b.sides));
-  assert.equal(new Set(ids).size, ids.length);
-  assert.deepEqual(Object.keys(PARTIES), ['democrat', 'republican', 'independent', 'none']);
-  assert.deepEqual([BOARDS.ai.sides, BOARDS.politics.sides], [LABS, PARTIES]);
-  assert.deepEqual(Object.values(BOARDS).map((b) => [b.key, b.list]), [['lab', 'labs'], ['party', 'parties']]);
-  const body = boardBody('politics', [{ lab: 'republican', players: 10, sum_score: 1000, sum_overconf: 55 }, { lab: 'democrat', players: 12, sum_score: 1560, sum_overconf: 12 },
-    { lab: 'none', players: 9, sum_score: 9000, sum_overconf: 0 }], 'all', NOW);
-  assert.deepEqual(body.parties, [
-    { party: 'democrat', name: 'Democrats', players: 12, mean_score: 130, mean_overconfidence: 1 },
-    { party: 'republican', name: 'Republicans', players: 10, mean_score: 100, mean_overconfidence: 5.5 },
-    { party: 'none', name: 'No side', players: 9, mean_score: null, mean_overconfidence: null },
-    { party: 'independent', name: 'Independents', players: 0, mean_score: null, mean_overconfidence: null },
-  ]);
-});
-
-test('end screen: "Which side are you on?" after a Politics quick round only; four chips, /parties, no share line', () => {
-  const fresh = String(sideBlock('politics', t, null));
-  assert.equal(fresh.match(/<button type="button" class="chip" data-lab="[a-z]+" aria-pressed="false">/g).length, 4);
-  assert.match(fresh, /<h3 id="lab-q">Which side are you on\?<\/h3>/);
-  assert.match(fresh, /<a href="\/parties">Full board<\/a>/);
-  assert.match(fresh, />Democrats<\/button><button type="button" class="chip" data-lab="republican" aria-pressed="false">Republicans<\/button>/);
-  assert.match(String(sideBlock('politics', t, 'none')), /<span data-lab-with>Your side: No side<\/span>/);
-  const board = boardBody('politics', [{ lab: 'democrat', players: 10, sum_score: 1000, sum_overconf: 20 }, { lab: 'republican', players: 10, sum_score: 900, sum_overconf: -20 }], 'all', NOW);
-  const table = String(sideTable('politics', board, 'republican', t, { full: true }));
-  assert.match(table, /<th scope="col">Side<\/th>/);
-  assert.match(table, /<tr class="is-mine"><th scope="row">Republicans <span class="lab-you">your side<\/span><\/th><td>10<\/td><td>90<\/td><td>2 points less sure than right<\/td><\/tr>/);
-  assert.match(table, /<th scope="row">Independents<\/th><td>0<\/td><td class="lab-need" colspan="2">10 more players needed<\/td>/);
-  assert.equal(sideShareLine('politics', board, 'democrat', t), null); // the Politics share text gains no side line
+test('end screen: a side block after an AI quick round only, never after a Politics one', () => {
   const st = (mode, pack) => ({ mode, pack });
   assert.deepEqual([st('quick', 'politics'), st('quick', 'ai'), st('quick', 'all'), st('quick', 'geography'), st('dare', 'ai'), st('dare', 'politics'), st('ranked', undefined)].map(boardOf),
-    ['politics', 'ai', null, null, null, null, null]);
+    [null, 'ai', null, null, null, null, null]);
 });

@@ -385,27 +385,5 @@
     "note": "Each AI round whose player names a lab counts once, so someone who plays three rounds counts three times. Averages appear from 10 players.",
     "play": "Play the AI round",
     "failed": "Couldn’t load the board. Try again later."
-  },
-  "parties": {
-    "question": "Which side are you on?",
-    "with": "Your side: {side}",
-    "change": "change",
-    "save_failed": "Couldn’t save your side. Try again.",
-    "full_board": "Full board",
-    "col_side": "Side",
-    "col_players": "Players",
-    "col_score": "Average score",
-    "col_over": "Overconfidence",
-    "yours": "your side",
-    "need": "{k} more players needed",
-    "need_one": "1 more player needed",
-    "title": "Which side bluffs less?",
-    "lead": "Self-reported: anyone who finishes a Politics round can say which side they’re on; nothing else is stored.",
-    "range_label": "Period",
-    "all_time": "All time",
-    "last_30": "Last 30 days",
-    "note": "Each Politics round whose player names a side counts once, so someone who plays three rounds counts three times. Averages appear from 10 players.",
-    "play": "Play the Politics round",
-    "failed": "Couldn’t load the board. Try again later."
   }
 }

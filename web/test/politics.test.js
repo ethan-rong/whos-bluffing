@@ -81,8 +81,6 @@ test('a Politics round: the reveal line of a drama pair, its category, the forma
     assert.equal(reactionBucket([{ ...a, correct: false, conf: 100 }], 0, 10), 'wrong_sure');
   }
   assert.equal((await complete(db, DATA, { round_id: 'POLRNDAAAAAA', anon_id: anon, surface: 'web' }, NOW, 'https://h')).status, 200);
-  const r = await claimSide(db, DATA, 'politics', { round_id: 'POLRNDAAAAAA', anon_id: anon, party: 'democrat' }, NOW);
-  assert.deepEqual([r.status, r.body.party, r.body.board.parties[0]], [200, 'democrat', { party: 'democrat', name: 'Democrats', players: 1, mean_score: null, mean_overconfidence: null }]);
   assert.deepEqual((await claimSide(db, DATA, 'ai', { round_id: 'POLRNDAAAAAA', anon_id: anon, lab: 'openai' }, NOW)).body, { error: 'only quick rounds in the AI pack can be claimed' });
 });
 

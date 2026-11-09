@@ -1,6 +1,6 @@
 // Self-reported boards (docs/api-rounds.md), one per pack that has one (public/packs.js BOARDS): after a quick round in
-// the AI pack a player can say which lab they are with (POST /api/round/lab, GET /api/labs), after one in the Politics
-// pack which side they are on (POST /api/round/party, GET /api/parties). Self-reported and anonymous: one claim per round
+// the AI pack a player can say which lab they are with (POST /api/round/lab, GET /api/labs). (The Politics pack's
+// party board, migration 0009, was removed; its rows stay in lab_claims and lab_agg with board 'parties'.) Self-reported and anonymous: one claim per round
 // with its board, the play's day, the round's difficulty and the stored play's score and overconfidence (migrations
 // 0008, 0009). Bounded: a claim reads the round and its play by key, then one batch writes the claim and two lab_agg rows
 // and reads the board; the board sums lab_agg (at most 6 sides x 3 difficulties a day), never lab_claims.
@@ -57,7 +57,7 @@ export function boardBody(pack, rows, range, now) {
 
 const fromDate = (range, now) => (RANGES[range] ? addDays(todayUTC(now), 1 - RANGES[range]) : '');
 
-// GET /api/labs, GET /api/parties ?range=all|30d
+// GET /api/labs?range=all|30d
 export async function sideBoard(db, pack, range, now) {
   if (!Object.hasOwn(RANGES, range)) return err(400, 'range must be all or 30d');
   const { results } = await db.prepare(BOARD_SQL).bind(BOARDS[pack].list, fromDate(range, now)).all();
@@ -75,8 +75,7 @@ function claimBodyError(pack, b) {
   return null;
 }
 
-// POST /api/round/lab {round_id, anon_id, lab} -> {ok, lab, board}; POST /api/round/party {round_id, anon_id, party} ->
-// {ok, party, board}: the board fresh, with this claim (range all).
+// POST /api/round/lab {round_id, anon_id, lab} -> {ok, lab, board}: the board fresh, with this claim (range all).
 export async function claimSide(db, data, pack, b, now) {
   const bad = claimBodyError(pack, b);
   if (bad) return bad;

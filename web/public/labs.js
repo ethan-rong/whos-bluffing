@@ -1,4 +1,4 @@
-// /labs and /parties: a pack's self-reported board (GET /api/labs or /api/parties, cached 60 s): players per side, and
+// /labs: the AI pack's self-reported board (GET /api/labs, cached 60 s): players per side, and
 // from 10 players the average score and the overconfidence in words, all time or the last 30 days. The table is the end
 // screen's (round-end.js).
 import { html, api } from './ui.js';

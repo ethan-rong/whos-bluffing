@@ -112,7 +112,6 @@ content /support '<h2 id="faq">Answers that may help</h2>' 'support: the FAQ mov
 content /test '<title>Full assessment' 'full assessment shell'
 content /stats '<title>Player stats' 'stats shell'
 content /labs '<title>Which lab bluffs least?' 'labs shell'
-content /parties '<title>Which side bluffs less?' 'parties shell'
 content /class '<title>Create a class code' 'class shell'
 content /class/d/AAAAAAAAAAAAAAAAAAAAAAAA '<script type="module" src="/app.js">' 'class dashboard (rewritten to the class shell, URL kept)'
 content /slack "<h1 id=\"slack-title\">Who's Bluffing? for Slack</h1>" 'Slack page'
@@ -871,26 +870,6 @@ CHECK=$(node -e '
   console.log("one claim: round, board, lab, day, difficulty, score, overconfidence, time, no anonymous id; lab_agg moved from anthropic to openai");
 ' "$STATE/labs_db.json" "$LROUND") || fail "lab tables" "$CHECK"
 pass "lab tables ($CHECK)"
-# The Politics board over HTTP. A claim needs a finished Politics round, and the pack has no pairs until
-# items/politics_curated.json is synced, so the claim itself is covered by test/labs.test.js and test/politics.test.js.
-echo "== parties: the Politics pack's board (GET /api/parties) and its refusals (POST /api/round/party)"
-pbody() { node -e 'const [r, a, p] = process.argv.slice(1); process.stdout.write(JSON.stringify({ round_id: r, anon_id: a, party: p }))' "$@"; }
-STATUS=$(curl -s -D "$STATE/parties.h" -o "$STATE/parties.json" -w '%{http_code}' "$BASE/api/parties"); BODY=$(cat "$STATE/parties.json")
-grep -qi '^cache-control: public, max-age=60' "$STATE/parties.h" || fail "GET /api/parties is cached for 60 s" "$(cat "$STATE/parties.h")"
-expect "GET /api/parties -> the four sides with their names, no claims yet (the lab claim stays on its own board), cache-control 60 s" 200 \
-  'r.range === "all" && r.min_players === 10 && r.parties.map((e) => `${e.party}:${e.name}:${e.players}`).join() === "democrat:Democrats:0,republican:Republicans:0,independent:Independents:0,none:No side:0" && r.parties.every((e) => Object.keys(e).join() === "party,name,players,mean_score,mean_overconfidence" && e.mean_score === null)'
-req GET "/api/parties?range=week"
-expect "GET /api/parties?range=week -> 400" 400 'r.error === "range must be all or 30d"'
-req POST /api/round/party "$(pbody "$LROUND" "$LABBER" democrat)"
-expect "a finished AI round on the Politics board -> 400" 400 'r.error === "only quick rounds in the Politics pack can be claimed"'
-req POST /api/round/party "$(pbody "$LROUND" "$LABBER" green)"
-expect "unknown party -> 400" 400 'r.error === "party must be democrat, republican, independent or none"'
-req POST /api/round/party "$(pbody "rk-$TODAY" "$HOST" none)"
-expect "a ranked round -> 400" 400 'r.error === "only quick rounds in the Politics pack can be claimed"'
-req POST /api/round/party "$(pbody ZZZZZZZZZZZZ "$LABBER" none)"
-expect "an unknown round -> 404" 404 'r.error === "unknown round"'
-req POST /api/round/party '{not json'
-expect "invalid JSON -> 400" 400 'r.error === "invalid JSON"'
 # After everything else too: the dare players are new web ids. The round can serve fewer than ten pairs if a pair shares
 # a value retired above (today's ranked AI pair), so the checks use the pairs it serves (N).
 echo "== dares: dr-altman (fixed pairs, answers, complete with rank), GET /api/dare/altman and /api/dares, the pages /dare/altman and /dares"
