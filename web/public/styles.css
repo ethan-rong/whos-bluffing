@@ -613,8 +613,8 @@ h3 { margin-top: 20px; }
 @media (hover: hover) and (pointer: fine) { .home-demo:hover .mock::before { transform: rotate(-6deg) translate(-12px, 6px); } }
 @media (min-width: 900px) {
   .home-hero { padding: 72px 0 112px; }
-  .home-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 64px; }
-  .home-demo { justify-self: end; }
+  /* Columns sized to their content and centred as one group, so no empty band opens between copy and game */
+  .home-grid { grid-template-columns: minmax(0, 440px) minmax(0, 540px); justify-content: center; gap: clamp(48px, 5vw, 80px); }
 }
 @media (max-width: 519px) {
   .home-hero { padding: 28px 0 56px; }
