@@ -30,7 +30,7 @@
       },
       {
         "name": "/bluff setup",
-        "does": "Sets where and when the daily question goes, how many hours later the answer is revealed, and roast mode. Every option is optional: a missing one keeps its value. A new channel gets a short hello, which also checks that Who's Bluffing may post there.",
+        "does": "The daily question starts in the channel that got the welcome. This sets where and when it goes, how many hours later the answer is revealed, and roast mode. Every option is optional: a missing one keeps its value. A new channel gets a short hello, which also checks that Who's Bluffing may post there.",
         "options": [
           { "name": "channel", "does": "where the daily question goes (a text or announcement channel)" },
           { "name": "hour", "does": "the posting hour in UTC, 0 to 23 (default 14); members see the post and reveal times in their own time zone" },
