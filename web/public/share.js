@@ -7,7 +7,12 @@ const SIZES = {
   square: { w: 1080, h: 1080, pad: 80, qr: 260, brand: 46, h1: 84, h2: 52, foot: 36 },
   wide: { w: 1200, h: 630, pad: 60, qr: 220, brand: 36, h1: 50, h2: 34, foot: 28 },
 };
-const FONT = 'ui-sans-serif, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji"';
+const FONT = '"Figtree", ui-sans-serif, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji"';
+const DISPLAY = `"Bricolage Grotesque", ${FONT}`; // headings and numbers; both faces are self-hosted (styles.css)
+// The cards draw at once with whatever has loaded, then once more when the two faces are ready.
+const fontsReady = () => (document.fonts?.load
+  ? Promise.all(['600 40px "Bricolage Grotesque"', '400 40px "Figtree"', '700 40px "Figtree"'].map((f) => document.fonts.load(f)))
+  : Promise.resolve());
 const COLORS = { bg: '#FBFAF7', fg: '#111827', muted: '#5B6472', accent: '#2F5BFF' }; // light tokens (styles.css)
 
 // The mark (brand/mark.svg, viewBox 38 x 44): two fanned cards, drawn back to front, and the diamond pip cut out of the
@@ -44,7 +49,7 @@ export function drawMark(g, x, y, h, { back = COLORS.accent, front = COLORS.fg, 
 function drawBrand(g, x, y, size) {
   const h = Math.round(size * 0.86);
   const w = drawMark(g, x, y + Math.round(size * 0.12), h);
-  g.font = `700 ${size}px ${FONT}`;
+  g.font = `600 ${size}px ${DISPLAY}`;
   g.fillStyle = COLORS.fg;
   g.fillText("Who's Bluffing?", x + w + Math.round(size * 0.3), y);
 }
@@ -68,14 +73,14 @@ export function wrap(text, maxWidth, measure) {
 
 const lineHeight = (size) => Math.round(size * 1.28);
 
-function layout(g, text, maxWidth, size, weight) {
-  g.font = `${weight} ${size}px ${FONT}`;
+function layout(g, text, maxWidth, size, weight, font = FONT) {
+  g.font = `${weight} ${size}px ${font}`;
   return wrap(text, maxWidth, (s) => g.measureText(s).width);
 }
 
 // Draws pre-wrapped lines from y downwards; returns the y below the last line.
-function drawLines(g, lines, x, y, size, weight, color) {
-  g.font = `${weight} ${size}px ${FONT}`;
+function drawLines(g, lines, x, y, size, weight, color, font = FONT) {
+  g.font = `${weight} ${size}px ${font}`;
   g.fillStyle = color;
   lines.forEach((l, i) => g.fillText(l, x, y + i * lineHeight(size)));
   return y + lines.length * lineHeight(size);
@@ -116,14 +121,14 @@ export function drawCard(kind, { t, lines, url }) {
 
   // Headlines, centred in the free space between the brand and the QR (square) or the footer (wide).
   const textW = kind === 'square' ? z.w - 2 * z.pad : footW;
-  const h1 = layout(g, lines.ranges, textW, z.h1, 700);
+  const h1 = layout(g, lines.ranges, textW, z.h1, 600, DISPLAY);
   const h2 = layout(g, lines.conf, textW, z.h2, 400);
   const gap = z.h2 * 0.6;
   const blockH = h1.length * lineHeight(z.h1) + gap + h2.length * lineHeight(z.h2);
   const top = z.pad + z.brand * 2;
   const bottom = kind === 'square' ? z.h - z.pad - z.qr : ctaY;
   const y = top + Math.max(0, (bottom - top - blockH) / 2);
-  drawLines(g, h2, z.pad, drawLines(g, h1, z.pad, y, z.h1, 700, COLORS.fg) + gap, z.h2, 400, COLORS.fg);
+  drawLines(g, h2, z.pad, drawLines(g, h1, z.pad, y, z.h1, 600, COLORS.fg, DISPLAY) + gap, z.h2, 400, COLORS.fg);
   return canvas;
 }
 
@@ -183,6 +188,7 @@ export function renderShare(ctx, el, lines) {
     };
   }
   draw();
+  fontsReady().then(draw, () => {}); // a face that fails to load keeps the system-font card
 }
 
 // --- rounds: the card is built around the type and the score; the QR opens the challenge link ----------------------
@@ -206,8 +212,8 @@ export function drawRoundCard(kind, { lines, url }) {
   const textW = z.w - 2 * z.pad - (kind === 'wide' ? z.qr + z.pad : 0);
   let y = z.pad + z.brand * 2;
   y = drawLines(g, layout(g, lines.kicker, textW, z.kicker, 600), z.pad, y, z.kicker, 600, COLORS.muted) + z.kicker * 0.2;
-  y = drawLines(g, layout(g, lines.type, textW, z.type, 800), z.pad, y, z.type, 800, COLORS.fg);
-  y = drawLines(g, layout(g, lines.score, textW, z.score, 800), z.pad, y + z.score * 0.1, z.score, 800, COLORS.accent);
+  y = drawLines(g, layout(g, lines.type, textW, z.type, 600, DISPLAY), z.pad, y, z.type, 600, COLORS.fg, DISPLAY);
+  y = drawLines(g, layout(g, lines.score, textW, z.score, 600, DISPLAY), z.pad, y + z.score * 0.1, z.score, 600, COLORS.accent, DISPLAY);
   drawLines(g, layout(g, lines.line, textW, z.line, 400), z.pad, y + z.line * 0.3, z.line, 400, COLORS.fg);
   const footW = z.w - 3 * z.pad - z.qr;
   const hostY = z.h - z.pad - z.foot;
@@ -272,4 +278,5 @@ export function renderRoundShare(ctx, el, { lines, copy, url, onShare }) {
     };
   }
   draw();
+  fontsReady().then(draw, () => {}); // a face that fails to load keeps the system-font card
 }

@@ -120,7 +120,7 @@ test('home page: the question count, the pack chips and the question list are wh
   assert.equal(new Set(names).size, names.length, 'a name twice');
   assert.equal([...home.matchAll(/<ul class="prompts-list" aria-hidden="true">/g)].length, 1);
   // The hero: Play now (the game's #play), Add to Discord, and Add to Slack as a text link; the band repeats all three.
-  const hero = home.match(/<section class="hero home-hero"[\s\S]*?<\/section>/)[0];
+  const hero = home.match(/<section class="hero home-hero[^"]*"[\s\S]*?<\/section>/)[0];
   assert.match(hero, /<button class="primary" id="play" type="button" data-play><svg[^>]*>.*?<\/svg><span>Play now<\/span><\/button>/);
   assert.match(hero, /<a class="button" href="\/discord"><svg[^>]*>.*?<\/svg><span>Add to Discord<\/span><\/a>/);
   assert.match(hero, /<a class="text-link" href="\/slack"><span>Add to Slack<\/span>/);

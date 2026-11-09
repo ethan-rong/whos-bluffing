@@ -7,6 +7,9 @@
 //                                          1280) and /discord, /commands (375, 1280); BASE is a running `npm run dev`
 //                                          (default http://127.0.0.1:8788). PAGE shoots one page only; a suffixed name
 //                                          (home-v2) shoots that page under the new name and keeps the earlier set
+//   node design/render.js pages [BASE] [DIR]
+//                                          every page in PAGES at 375 and 1280 px, light and dark, whole, into DIR (a
+//                                          new temp folder by default), for review
 //   node design/render.js checks [BASE]    overflow at 375 px and layout shift on every page, keyboard walk on /, /slack,
 //                                          /discord and /commands, theme toggle label and persistence
 //   node design/render.js flow [BASE]      local-only: home -> picker -> resume -> results, reload/back/forward, replay
@@ -136,6 +139,21 @@ async function screens(cdp, base, only) {
         await evaluate(cdp, "document.documentElement.style.scrollbarGutter = 'auto'");
         await capture(cdp, join(WEB, `design/screens/${name}-${w}-${dark ? 'dark' : 'light'}.png`), w);
         if (HERO_SHOTS.includes(name) && w === 1280 && !dark) await capture(cdp, join(WEB, `design/screens/${name}-hero-1280-light.png`), w, h); // the press kit's view
+      }
+    }
+  }
+}
+
+// Every page in PAGES at 375 and 1280 px, light and dark, whole, into dir (a review set; not committed).
+async function pageScreens(cdp, base, dir) {
+  mkdirSync(dir, { recursive: true });
+  for (const path of PAGES) {
+    const name = path === '/' ? 'home' : path.slice(1).replaceAll('/', '-');
+    for (const dark of [false, true]) {
+      for (const [w, h] of [[375, 812], [1280, 800]]) {
+        await open(cdp, `${base}${path}`, { width: w, height: h, dark });
+        await evaluate(cdp, "document.documentElement.style.scrollbarGutter = 'auto'");
+        await capture(cdp, join(dir, `${name}-${w}-${dark ? 'dark' : 'light'}.png`), w);
       }
     }
   }
@@ -651,12 +669,13 @@ let failed = 0;
 try {
   if (mode === 'assets') await assets(cdp);
   else if (mode === 'screens') await screens(cdp, base, part);
+  else if (mode === 'pages') await pageScreens(cdp, base, part ?? mkdtempSync(join(tmpdir(), 'whosbluffing-pages-')));
   else if (mode === 'checks') failed = await checks(cdp, base);
   else if (mode === 'flow') await flowCheck(cdp, base);
   else if (mode === 'rounds') await roundScreens(cdp, base);
   else if (mode === 'results') await resultScreens(cdp, base);
   else if (mode === 'demo') await demo(cdp, base, part, music, edition);
-  else throw new Error(`unknown mode ${mode} (assets | screens | checks | flow | rounds | results | demo)`);
+  else throw new Error(`unknown mode ${mode} (assets | screens | pages | checks | flow | rounds | results | demo)`);
 } finally {
   cdp.close();
 }
