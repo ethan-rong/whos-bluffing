@@ -161,7 +161,7 @@ async function pageScreens(cdp, base, dir) {
 
 // Plays a round through the API: pattern of 1 (right) / 0 per pair, confidences cycled; returns complete's body.
 async function playRoundApi(base, round, anon, pattern, confs, extra = {}) {
-  const truth = new Map(JSON.parse(readFileSync(join(WEB, 'functions/_pairs.json'), 'utf8')).pairs.map(([n, , , t]) => [`p${String(n).padStart(5, '0')}`, t]));
+  const truth = truthOf(); // pairs and the curated quick items (quick rounds serve q-ids)
   for (const [k, item] of round.items.entries()) {
     const right = pattern[k % pattern.length] === '1';
     await post(base, '/api/round/answer', { round_id: round.round_id, item_id: item.id, choice: right ? truth.get(item.id) : 1 - truth.get(item.id),

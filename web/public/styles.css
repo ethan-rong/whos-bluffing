@@ -1,6 +1,8 @@
 /* Who's Bluffing: one stylesheet for every page. Mobile-first.
    Type: Bricolage Grotesque for display (headings, numbers, the stamp), Figtree for text; both self-hosted from
-   /fonts (OFL, licences beside them), latin subset, so no third party sees a visitor. System fonts are the fallback.
+   /fonts (OFL, licences beside them), latin subset, so no third party sees a visitor. Every page preloads both and
+   they use font-display: optional, so text never reflows after the first paint (render.js checks wants zero layout
+   shift); a slow first visit keeps the system fallback for that page.
    Tokens: light by default; dark from prefers-color-scheme unless the visitor chose light, or from the stored toggle
    (site.js sets data-theme). The two dark blocks must stay identical; web/design/contrast.js checks every
    text/background pair below. --hit/--miss are fills (squares, bars, borders); text uses --hit-ink/--miss-ink.
@@ -10,7 +12,7 @@
   font-family: "Bricolage Grotesque";
   font-style: normal;
   font-weight: 200 800;
-  font-display: swap;
+  font-display: optional;
   src: url("fonts/bricolage-grotesque.woff2") format("woff2");
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
@@ -18,7 +20,7 @@
   font-family: "Figtree";
   font-style: normal;
   font-weight: 300 900;
-  font-display: swap;
+  font-display: optional;
   src: url("fonts/figtree.woff2") format("woff2");
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
@@ -73,7 +75,7 @@
   :root:not([data-theme="light"]) {
     --bg: #0E1116;
     --surface: #161B22;
-    --ground-alt: #12161C;
+    --ground-alt: #141920;
     --text: #E6EDF3;
     --muted: #9AA4B2;
     --border: #262D37;
@@ -98,7 +100,7 @@
 :root[data-theme="dark"] {
   --bg: #0E1116;
   --surface: #161B22;
-  --ground-alt: #12161C;
+  --ground-alt: #141920;
   --text: #E6EDF3;
   --muted: #9AA4B2;
   --border: #262D37;
@@ -972,6 +974,10 @@ img.dc-avatar { display: block; object-fit: cover; }
 .player-status h1 { margin: 0; color: var(--muted); font-family: var(--font); font-size: var(--fs-4); font-weight: 600; letter-spacing: normal; }
 .player-count { margin: 8px 0 16px; font-family: var(--font-display); font-size: clamp(96px, 22vw, 208px); font-weight: 600; line-height: 1; letter-spacing: -0.06em; font-variant-numeric: tabular-nums; }
 .player-status .status-line { justify-content: center; margin: 12px 0 24px; font-size: var(--fs-6); }
+/* No layout shift when the count arrives: the number's box spans the column, and the status line keeps its space when
+   status.js hides it */
+.player-count { align-self: stretch; }
+.player-status .status-line[hidden] { display: flex !important; visibility: hidden; }
 
 @media (max-width: 519px) {
   #app, #round-setup { padding-top: 24px; padding-bottom: 48px; }
