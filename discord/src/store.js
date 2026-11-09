@@ -18,12 +18,33 @@ export async function ensureInstall(db, guildId, now) {
 }
 
 // Install event: registers the server (no channel yet; a known server keeps its settings) and claims the hello for
-// this event. True for a new server or a new install; false for Discord's retry of an event already handled.
+// this event, which also spends the server's automatic channel pick. True for a new server or a new install; false
+// for Discord's retry of an event already handled.
 export async function claimWelcome(db, guildId, now, eventTime) {
   return changedOne(await db.prepare(
-    `INSERT INTO installs (guild_id, installed_at, welcomed, reveal_delay_h) VALUES (?, ?, ?, ?)
-     ON CONFLICT(guild_id) DO UPDATE SET welcomed = excluded.welcomed WHERE installs.welcomed IS NOT excluded.welcomed`,
-  ).bind(guildId, now, eventTime, NEW_REVEAL_DELAY_H).run());
+    `INSERT INTO installs (guild_id, installed_at, welcomed, reveal_delay_h, auto_channel) VALUES (?, ?, ?, ?, ?)
+     ON CONFLICT(guild_id) DO UPDATE SET welcomed = excluded.welcomed, auto_channel = excluded.auto_channel
+     WHERE installs.welcomed IS NOT excluded.welcomed`,
+  ).bind(guildId, now, eventTime, NEW_REVEAL_DELAY_H, now).run());
+}
+
+// The channel that took the hello becomes the daily channel, unless an admin already chose one.
+export const adoptChannel = (db, guildId, channelId) =>
+  db.prepare('UPDATE installs SET channel_id = ? WHERE guild_id = ? AND channel_id IS NULL').bind(channelId, guildId).run();
+
+// Servers added before automatic picks that never set a channel or posted: up to `limit` of them.
+export async function unpickedInstalls(db, limit) {
+  const { results } = await db.prepare(
+    `SELECT * FROM installs i WHERE i.auto_channel IS NULL AND i.channel_id IS NULL
+     AND NOT EXISTS (SELECT 1 FROM posts p WHERE p.guild_id = i.guild_id) LIMIT ?`,
+  ).bind(limit).all();
+  return results;
+}
+
+// True when this call took the server's one automatic pick.
+export async function claimPick(db, guildId, now) {
+  return changedOne(await db.prepare('UPDATE installs SET auto_channel = ? WHERE guild_id = ? AND auto_channel IS NULL')
+    .bind(now, guildId).run());
 }
 
 export const saveSetup = (db, guildId, { channel_id: channel, post_hour_utc: hour, reveal_delay_h: revealDelay, roast }) =>

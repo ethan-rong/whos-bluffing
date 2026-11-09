@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { WELCOME } from '../src/game.js';
+import { WELCOME, channelHello } from '../src/game.js';
 import {
-  APP_ID, CHANNEL, GUILD, USER, channelOfPost, channelPosts, install, makeCtx, makeEnv, mockFetch, runCron, send, signedRequest,
+  APP_ID, CHANNEL, GUILD, USER, addPost, channelOfPost, channelPosts, install, makeCtx, makeEnv, mockFetch, runCron, send, signedRequest,
   worker,
 } from './helpers.js';
 
@@ -52,15 +52,16 @@ test('events: PING gets 204 with an empty body', async () => {
   assert.equal(calls.length, 0);
 });
 
-test('server install: registers the server without a channel and posts one hello in its system channel', async () => {
+test('server install: registers the server, posts one hello in its system channel and makes it the daily channel', async () => {
   const env = makeEnv();
   const calls = mockFetch({ discord: server({ channels: [text(T1, 0)] }) });
   const res = await send(env, toEvents(authorized()));
   assert.equal(res.status, 204);
-  const [{ installed_at: installedAt, ...row }] = env.DB.rows('SELECT * FROM installs');
+  const [{ installed_at: installedAt, auto_channel: autoChannel, ...row }] = env.DB.rows('SELECT * FROM installs');
   // A new server reveals 20 hours after the post.
-  assert.deepEqual(row, { guild_id: GUILD, channel_id: null, post_hour_utc: 14, reveal_delay_h: 20, roast: 0, last_recap: null, welcomed: TS });
+  assert.deepEqual(row, { guild_id: GUILD, channel_id: SYSTEM, post_hour_utc: 14, reveal_delay_h: 20, roast: 0, last_recap: null, welcomed: TS });
   assert.match(installedAt, /^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}Z$/);
+  assert.equal(autoChannel, installedAt);
   // The system channel takes the post, so the channel list is never fetched.
   assert.deepEqual(calls.map((c) => `${c.method} ${c.path}`), [`GET /api/v10/guilds/${GUILD}`, `POST /api/v10/channels/${SYSTEM}/messages`]);
   assert.ok(calls.every((c) => c.headers.authorization === 'Bot bot-token'));
@@ -69,9 +70,10 @@ test('server install: registers the server without a channel and posts one hello
   assert.deepEqual(hello.body.components[0].components, [{ type: 2, style: 1, custom_id: 'start', label: 'Play solo' }, { type: 2, style: 1, custom_id: 'startparty', label: 'Play with friends' }]);
   assert.deepEqual(hello.body, WELCOME);
   assert.deepEqual(hello.body.allowed_mentions, { parse: [] });
+  assert.match(hello.body.content, /Daily question:.*`\/bluff setup`/s);
 
-  await runCron(env, '2026-10-06T14:00:00Z'); // no channel yet: the daily question waits for /bluff setup
-  assert.equal(channelPosts(calls).length, 1);
+  await runCron(env, '2026-10-06T14:00:00Z'); // the daily question starts with no /bluff setup
+  assert.deepEqual(posted(calls), [SYSTEM, SYSTEM]);
 });
 
 test('server install: the system channel refuses, so text channels follow in position order until a post lands', async () => {
@@ -106,6 +108,8 @@ test('server install: no writable channel gives up quietly after 3 posts and kee
   assert.deepEqual(posted(calls), [T1, T2, T3]);
   assert.deepEqual(logged, []);
   assert.deepEqual(env.DB.rows('SELECT guild_id, channel_id FROM installs'), [{ guild_id: GUILD, channel_id: null }]);
+  await runCron(env, '2026-10-06T10:00:00Z'); // the install's one pick is spent: the hourly run tries nothing more
+  assert.deepEqual(posted(calls), [T1, T2, T3]);
 });
 
 test('user install (integration_type 1) is acknowledged and ignored', async () => {
@@ -186,4 +190,52 @@ test('server install answers 204 without waiting for Discord; the server is regi
   release();
   await ctx.settle();
   assert.deepEqual(posted(calls), [SYSTEM]);
+});
+
+// Servers added before installs picked the daily channel: the hourly run makes the same pick once per server.
+
+test('a server added before auto channels gets one hello from the hourly run, then the daily question there', async () => {
+  const env = makeEnv();
+  await install(env, GUILD);
+  const calls = mockFetch({ discord: server({ channels: [text(T1, 0)] }) });
+  await runCron(env, '2026-10-06T10:00:00Z');
+  assert.deepEqual(posted(calls), [SYSTEM]);
+  assert.deepEqual(channelPosts(calls)[0].body, channelHello(14, Date.parse('2026-10-06T10:00:00Z')));
+  assert.equal(env.DB.rows('SELECT channel_id FROM installs')[0].channel_id, SYSTEM);
+  await runCron(env, '2026-10-06T14:00:00Z');
+  await runCron(env, '2026-10-06T15:00:00Z');
+  assert.deepEqual(posted(calls), [SYSTEM, SYSTEM]); // hello, then the 14:00 question; no second hello
+});
+
+test('the hourly pick leaves servers that have a channel or ever posted, and tries an unwritable server once', async () => {
+  const env = makeEnv();
+  await install(env, GUILD);
+  await addPost(env, { guild: GUILD }); // played /bluff question once, never set up: left alone
+  await install(env, G2, { channel: C2 });
+  const calls = mockFetch({ discord: (c) => (c.method === 'GET' ? { body: { system_channel_id: SYSTEM } } : undefined) });
+  await runCron(env, '2026-10-06T10:00:00Z');
+  assert.deepEqual(posted(calls), []);
+  assert.deepEqual(env.DB.rows('SELECT guild_id, channel_id FROM installs ORDER BY guild_id'), [
+    { guild_id: GUILD, channel_id: null }, { guild_id: G2, channel_id: C2 },
+  ]);
+
+  const env2 = makeEnv();
+  await install(env2, GUILD);
+  const calls2 = mockFetch({ discord: server({ system: null, channels: [text(T1, 1)], refuse: [T1] }) });
+  await runCron(env2, '2026-10-06T10:00:00Z');
+  await runCron(env2, '2026-10-06T11:00:00Z');
+  assert.deepEqual(posted(calls2), [T1]);
+  assert.equal(env2.DB.rows('SELECT channel_id FROM installs')[0].channel_id, null);
+});
+
+test('the hourly pick handles five servers a run', async () => {
+  const env = makeEnv();
+  const guilds = Array.from({ length: 7 }, (_, k) => `7700000000000001${String(k).padStart(2, '0')}`);
+  for (const g of guilds) await install(env, g);
+  const calls = mockFetch({ discord: (c) => (c.method === 'GET' ? { body: { system_channel_id: SYSTEM } } : undefined) });
+  await runCron(env, '2026-10-06T10:00:00Z');
+  assert.equal(posted(calls).length, 5);
+  await runCron(env, '2026-10-06T11:00:00Z');
+  assert.equal(posted(calls).length, 7);
+  assert.equal(env.DB.rows('SELECT COUNT(*) AS n FROM installs WHERE channel_id = ?', SYSTEM)[0].n, 7);
 });

@@ -134,7 +134,7 @@ export const WELCOME = {
   content: "Who's Bluffing? is in. Think you know more than your friends?\n\n" +
     '**Play solo:** ten private questions. **Play with friends:** the same ten questions, private answers, shared scores.\n' +
     'Pick a topic and difficulty, then Start. You can also type `/bluff play` or `/bluff party`.\n\n' +
-    'Optional daily question: an admin can run `/bluff setup channel:#channel`.',
+    '**Daily question:** one a day, here. An admin can move it or change the hour with `/bluff setup`.',
   components: playButtons(),
   allowed_mentions: NO_PINGS,
 };
