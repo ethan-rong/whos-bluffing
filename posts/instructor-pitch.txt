@@ -1,2 +1,0 @@
-EN (forwardable):
-A free tool for the overconfidence demo: students answer ten "which is bigger" questions on their phones and stake their confidence; a proper scoring rule rewards honest confidence, and the class's calibration curve appears live on your screen. Create a class code at {URL}/class — no accounts, aggregates only, nothing shown until 5 students finish. The classic 90%-interval version is at {URL}/test. Non-commercial; source published for transparency.

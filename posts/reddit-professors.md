@@ -1,3 +1,0 @@
-Title: Free classroom tool for the overconfidence demo, now as a 30-second game (intro psych / stats / econ / decision making)
-
-Students take ten "which is bigger" questions on their phones and stake their confidence from 50% to 100%; a proper scoring rule makes honest confidence the best strategy, and the class's calibration curve builds live on your screen. Create a class code at {URL}/class — no accounts, aggregates only, nothing shown until 5 students have finished. The full 5-minute assessment with 90% intervals is still there at {URL}/test for the classic demo. Free, non-commercial, no ads. Built by an undergraduate as part of an open study; anonymous pooled data will be released publicly. Feedback on what would make it more useful in class is welcome.

@@ -1,4 +1,0 @@
-Name: Who's Bluffing?
-Tagline: Find out who's bluffing — a 30-second confidence game for you, your team, your server
-Description: Ten comparison questions. Pick one, stake how sure you are, see the truth. Honest confidence scores best; 100% wrong hurts. Get your type, challenge a friend on the same questions, and add it to Slack or Discord for a daily question with a reveal of the biggest bluff. Free, anonymous, data released for research, no ads.
-First comment: I built this because "90% sure" usually means 70% right, and nobody finds that out about themselves. Every question comes from Wikidata with the source attached; you can flag bad ones. The scoring rule is the quadratic proper scoring rule, so there's no way to game it except being honest. The hypotheses I'm testing were posted before launch. Ask me anything about the infra — it runs on about $5/month.

@@ -13,3 +13,15 @@ anki/src/whosbluffing/user_files/
 
 # Agent worktrees (local only)
 .claude/worktrees/
+
+# Promotion drafts and tooling (local only, kept out of the public repo)
+posts/*
+!posts/ai-humor.md
+docs/GROWTH_PLAYBOOK.md
+docs/LAUNCH_RUNBOOK.md
+docs/SEEDING_LIST.md
+docs/TOD_TRACTION.md
+docs/VIRAL_FORMATS.md
+docs/server-targets.*
+USER_TODO.md
+x/
