@@ -339,10 +339,10 @@ async function revealNow(env, i) {
 
 // ---- Install hello, setup, stats, recap ----------------------------------------------------------------------
 
-// The install hello, posted once per install event: the server's system channel, else its text channels in position
-// order. Stops at the post that lands and gives up quietly after WELCOME_TRIES posts (a server where Who's Bluffing may
-// not write anywhere is fine). Returns the channel id, or null.
-export async function welcomeGuild(env, guildId) {
+// The install hello (or `message`), posted once per install event: the server's system channel, else its text
+// channels in position order. Stops at the post that lands and gives up quietly after WELCOME_TRIES posts (a server
+// where Who's Bluffing may not write anywhere is fine). Returns the channel id, or null.
+export async function welcomeGuild(env, guildId, message = game.WELCOME) {
   const read = async (path) => {
     const res = await discord(env, 'GET', path);
     return res.ok ? res.json() : null;
@@ -350,7 +350,7 @@ export async function welcomeGuild(env, guildId) {
   let tries = 0;
   const post = async (channelId) => {
     tries += 1;
-    return (await discord(env, 'POST', `/channels/${channelId}/messages`, game.WELCOME)).ok;
+    return (await discord(env, 'POST', `/channels/${channelId}/messages`, message)).ok;
   };
   const system = (await read(`/guilds/${guildId}`))?.system_channel_id;
   if (system && (await post(system))) return system;

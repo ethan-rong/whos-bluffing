@@ -1,11 +1,11 @@
 // Who's Bluffing for Discord: the interactions endpoint, the webhook events endpoint (server installs), the install
-// redirect, and the hourly tick (reveal what is due, Monday recaps, then the daily question for servers whose hour
-// has come).
+// redirect, and the hourly tick (reveal what is due, Monday recaps, the daily question for servers whose hour has
+// come, then the one automatic channel pick for servers added before installs made it).
 
 import { verifyDiscord } from './verify.js';
 import * as api from './api.js';
 import * as store from './store.js';
-import { isoDate } from './game.js';
+import { channelHello, isoDate } from './game.js';
 import { handleInteraction, installUrl, personalInstallUrl, logError, postQuestion, postRecap, revealPost, welcomeGuild } from './commands.js';
 import { purge as purgeParties, LIFETIME } from './party-store.js';
 
@@ -19,6 +19,7 @@ const MONDAY = 1;
 const CHANNEL_GONE = new Set([403, 404]);
 const WEBHOOK_EVENT = 1; // webhook events: 0 = PING, 1 = an event
 const USER_INSTALL = 1; // integration_type: 0 = server, 1 = a member's own account
+const PICKS_PER_TICK = 5; // keeps each hourly run to about 25 Discord calls for the picks
 
 const textResponse = (body, status = 200) => new Response(body, { status, headers: { 'content-type': 'text/plain; charset=utf-8' } });
 
@@ -46,7 +47,7 @@ async function interactions(request, env, ctx) {
 }
 
 // Webhook events: the PING on save, and APPLICATION_AUTHORIZED for a server install, which registers the server and
-// says hello once. Anything else is acknowledged and ignored (an error makes Discord retry and, in the end, drop the
+// says hello once; the channel that takes the hello becomes the daily channel. Anything else is acknowledged and ignored (an error makes Discord retry and, in the end, drop the
 // URL). The D1 write happens before the 204, so if it fails Discord retries; the Discord calls run after it.
 async function events(request, env, ctx) {
   const body = await signedJson(request, env);
@@ -56,7 +57,11 @@ async function events(request, env, ctx) {
   if (guildId && event.type === 'APPLICATION_AUTHORIZED' && event.data.integration_type !== USER_INSTALL) {
     // A retry carries the same event timestamp: it finds the hello claimed and posts nothing.
     if (await store.claimWelcome(env.DB, guildId, new Date().toISOString(), event.timestamp ?? '')) {
-      ctx.waitUntil(welcomeGuild(env, guildId).catch((err) => logError('welcome', err)));
+      const welcome = async () => {
+        const channel = await welcomeGuild(env, guildId);
+        if (channel) await store.adoptChannel(env.DB, guildId, channel);
+      };
+      ctx.waitUntil(welcome().catch((err) => logError('welcome', err)));
     }
   }
   // Discord documents this event with `user` only, so it acts only if a server is named. Without it, the next daily
@@ -96,13 +101,24 @@ async function postDue(env, now) {
   }
 }
 
+// Servers added before installs picked the daily channel get the same pick once, with the setup hello instead.
+// ponytail: one-off backfill; drop this step once no install row has auto_channel NULL without a channel or post.
+async function pickDue(env, now) {
+  for (const install of await store.unpickedInstalls(env.DB, PICKS_PER_TICK)) {
+    if (!(await store.claimPick(env.DB, install.guild_id, now.toISOString()))) continue;
+    const channel = await welcomeGuild(env, install.guild_id, channelHello(install.post_hour_utc, now.getTime()))
+      .catch((err) => logError('pick', err));
+    if (channel) await store.adoptChannel(env.DB, install.guild_id, channel);
+  }
+}
+
 async function tick(env, now) {
   const cleanup = async () => {
     await purgeParties(env.DB, now.getTime());
     await env.DB.prepare('DELETE FROM play_state WHERE updated_at <= ?').bind(now.getTime() - LIFETIME).run();
     await env.DB.prepare('DELETE FROM round_setups WHERE expires_at <= ?').bind(now.getTime()).run();
   };
-  for (const [name, step] of [['cleanup', cleanup], ['reveal', revealDue], ['recap', recapDue], ['post', postDue]]) {
+  for (const [name, step] of [['cleanup', cleanup], ['reveal', revealDue], ['recap', recapDue], ['post', postDue], ['pick', pickDue]]) {
     await step(env, now).catch((err) => logError(name, err));
   }
 }
