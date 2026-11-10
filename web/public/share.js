@@ -8,10 +8,11 @@ const SIZES = {
   wide: { w: 1200, h: 630, pad: 60, qr: 220, brand: 36, h1: 50, h2: 34, foot: 28 },
 };
 const FONT = '"Figtree", ui-sans-serif, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji"';
-const DISPLAY = `"Bricolage Grotesque", ${FONT}`; // headings and numbers; both faces are self-hosted (styles.css)
+const DISPLAY = '"Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif'; // headings, at 400 only (one weight
+// ships; never ask for a bold Newsreader); numbers are Figtree 700. Both faces are self-hosted (styles.css).
 // The cards draw at once with whatever has loaded, then once more when the two faces are ready.
 const fontsReady = () => (document.fonts?.load
-  ? Promise.all(['600 40px "Bricolage Grotesque"', '400 40px "Figtree"', '700 40px "Figtree"'].map((f) => document.fonts.load(f)))
+  ? Promise.all(['400 40px "Newsreader"', '400 40px "Figtree"', '700 40px "Figtree"'].map((f) => document.fonts.load(f)))
   : Promise.resolve());
 const COLORS = { bg: '#FBFAF7', fg: '#111827', muted: '#5B6472', accent: '#2F5BFF' }; // light tokens (styles.css)
 
@@ -49,7 +50,7 @@ export function drawMark(g, x, y, h, { back = COLORS.accent, front = COLORS.fg, 
 function drawBrand(g, x, y, size) {
   const h = Math.round(size * 0.86);
   const w = drawMark(g, x, y + Math.round(size * 0.12), h);
-  g.font = `600 ${size}px ${DISPLAY}`;
+  g.font = `400 ${size}px ${DISPLAY}`;
   g.fillStyle = COLORS.fg;
   g.fillText("Who's Bluffing?", x + w + Math.round(size * 0.3), y);
 }
@@ -121,14 +122,14 @@ export function drawCard(kind, { t, lines, url }) {
 
   // Headlines, centred in the free space between the brand and the QR (square) or the footer (wide).
   const textW = kind === 'square' ? z.w - 2 * z.pad : footW;
-  const h1 = layout(g, lines.ranges, textW, z.h1, 600, DISPLAY);
+  const h1 = layout(g, lines.ranges, textW, z.h1, 400, DISPLAY);
   const h2 = layout(g, lines.conf, textW, z.h2, 400);
   const gap = z.h2 * 0.6;
   const blockH = h1.length * lineHeight(z.h1) + gap + h2.length * lineHeight(z.h2);
   const top = z.pad + z.brand * 2;
   const bottom = kind === 'square' ? z.h - z.pad - z.qr : ctaY;
   const y = top + Math.max(0, (bottom - top - blockH) / 2);
-  drawLines(g, h2, z.pad, drawLines(g, h1, z.pad, y, z.h1, 600, COLORS.fg, DISPLAY) + gap, z.h2, 400, COLORS.fg);
+  drawLines(g, h2, z.pad, drawLines(g, h1, z.pad, y, z.h1, 400, COLORS.fg, DISPLAY) + gap, z.h2, 400, COLORS.fg);
   return canvas;
 }
 
@@ -231,8 +232,8 @@ export function drawRoundCard(kind, { lines, url, emblem = null }) {
   const rowW = emblem ? Math.min(textW, qrX - z.pad * 1.5) : textW;
   let y = z.pad + z.brand * 2;
   y = drawLines(g, layout(g, lines.kicker, textW, z.kicker, 600), z.pad, y, z.kicker, 600, COLORS.muted) + z.kicker * 0.2;
-  y = drawLines(g, layout(g, lines.type, textW, z.type, 600, DISPLAY), z.pad, y, z.type, 600, COLORS.fg, DISPLAY);
-  y = drawLines(g, layout(g, lines.score, rowW, z.score, 600, DISPLAY), z.pad, y + z.score * 0.1, z.score, 600, COLORS.accent, DISPLAY);
+  y = drawLines(g, layout(g, lines.type, textW, z.type, 400, DISPLAY), z.pad, y, z.type, 400, COLORS.fg, DISPLAY);
+  y = drawLines(g, layout(g, lines.score, rowW, z.score, 700), z.pad, y + z.score * 0.1, z.score, 700, COLORS.accent);
   drawLines(g, layout(g, lines.line, rowW, z.line, 400), z.pad, y + z.line * 0.3, z.line, 400, COLORS.fg);
   const footW = z.w - 3 * z.pad - z.qr;
   const hostY = z.h - z.pad - z.foot;

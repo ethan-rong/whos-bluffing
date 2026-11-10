@@ -1,6 +1,6 @@
 # Who's Bluffing? web
 
-English only. A free game of rounds (ten either-or comparison questions with a confidence each: unlimited topic rounds, challenge links, and one question a day for Slack and Discord) and a 5-minute full assessment (12 two-choice questions with a confidence rating, 6 numeric 90% ranges, 2 attention checks). Static frontend (vanilla ES modules, no bundler) on Cloudflare Pages, API in Pages Functions, data in D1. No accounts, no cookies, no third-party scripts or font hosts (Bricolage Grotesque and Figtree are self-hosted, OFL), no IP or user-agent storage.
+English only. A free game of rounds (ten either-or comparison questions with a confidence each: unlimited topic rounds, challenge links, and one question a day for Slack and Discord) and a 5-minute full assessment (12 two-choice questions with a confidence rating, 6 numeric 90% ranges, 2 attention checks). Static frontend (vanilla ES modules, no bundler) on Cloudflare Pages, API in Pages Functions, data in D1. No accounts, no cookies, no third-party scripts or font hosts (Newsreader for headings and Figtree for text are self-hosted, OFL), no IP or user-agent storage.
 
 ## Page map
 

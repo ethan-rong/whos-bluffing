@@ -32,7 +32,7 @@ Draw order: back card, front card, pip. In the 64×64 tile the mark is scaled to
 
 ## Lockup
 
-Bare mark at about 1.2× the cap height, 8px gap, then `Who's Bluffing?` in the site's 800-weight system font stack.
+Bare mark at about 1.2× the cap height, 8px gap, then `Who's Bluffing?` in Newsreader at weight 400 (the site's heading serif).
 The typed question mark stays.
 
 ## Rules
