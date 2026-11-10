@@ -236,9 +236,9 @@ figcaption, .small { font-size: var(--fs-6); }
 :where(button, .button):where(:active:not(:disabled)) { transform: translateY(1px) scale(0.985); transition-duration: 0.09s; }
 /* Marketing actions (links as buttons, hero and page actions, the close panel) are pills: soft grey, or the accent
    for .primary; borderless, 44px. Game controls, and links inside the game, keep the 48px recipe above. */
-:where(a.button, .actions button, .band-go button):where(:not(#app *)) { min-height: 44px; padding: 0 20px; border: 0; border-radius: 999px; background: color-mix(in srgb, var(--text) 7%, transparent); font-size: 15px; font-weight: 500; }
-:where(a.button, .actions button, .band-go button):where(:not(#app *)):hover { background: color-mix(in srgb, var(--text) 11%, transparent); }
-a.button:where(:not(.primary)):where(:not(#app *)) { color: var(--text); } /* over the base link colour */
+:where(a.button, .actions button, .band-go button):where(:not(#app *, #round-setup *)) { min-height: 44px; padding: 0 20px; border: 0; border-radius: 999px; background: color-mix(in srgb, var(--text) 7%, transparent); font-size: 15px; font-weight: 500; }
+:where(a.button, .actions button, .band-go button):where(:not(#app *, #round-setup *)):hover:where(:not(:disabled)) { background: color-mix(in srgb, var(--text) 11%, transparent); }
+a.button:where(:not(.primary)):where(:not(#app *, #round-setup *)) { color: var(--text); } /* over the base link colour */
 .primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 .primary:hover { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 86%, var(--text)); }
 .ghost { background: transparent; border-color: transparent; color: var(--accent); }
