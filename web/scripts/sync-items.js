@@ -138,7 +138,7 @@ export const serverPool = (pool) => ({
 
 const LEVELS_R = ['easy', 'medium', 'hard'];
 const num = (id) => Number(id.slice(1));
-const rankedOk = (item) => item?.ref_quality === 'referenced' || item?.fact_checked === true; // PREREG Study A
+const rankedOk = (item) => item?.ref_quality === 'referenced' || item?.fact_checked === true; // ranked rounds: Wikidata reference or fact-check
 
 // Problems with items/pairs.json against the pool; empty means usable.
 export function validatePairs(doc, poolItems) {
@@ -164,7 +164,7 @@ export function validatePairs(doc, poolItems) {
   return errs;
 }
 
-// Problems with daily/rounds.json: its shape, and the PREREG rule that ranked rounds (and the chat question) use only
+// Problems with daily/rounds.json: its shape, and the rule that ranked rounds (and the chat question) use only
 // items with a Wikidata reference or a fact-check. The scheduling heuristics (at most 2 per category, the 3/4/3 mix,
 // reuse gaps, distinct entities) belong to pairs.py and scripts/check.sh, so a hand swap is not blocked by them.
 export function validateRounds(rounds, pairsById, poolItems) {

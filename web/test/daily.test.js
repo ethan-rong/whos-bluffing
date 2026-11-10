@@ -265,7 +265,7 @@ test('KPI on a fixture DB: full assessments count per surface, classrooms from 5
   const session = (id, created, anonId, classCode = null) => db.sqlite.prepare(`INSERT INTO sessions (id, created_at, lang, class_code, answers, anon_id)
     VALUES (?, ?, 'en', ?, '[]', ?)`).run(id, created, classCode, anonId);
 
-  playRow('a1', '2026-10-20', 'web'); playRow('s1', '2026-10-31', 'slack'); // the retired daily game: not a play under PREREG
+  playRow('a1', '2026-10-20', 'web'); playRow('s1', '2026-10-31', 'slack'); // the retired daily game: not a play
   session('x-a1', '2026-10-31T10:00:00.000Z', 'a1');
   session('x-w9', '2026-10-25T10:00:00.000Z', 'w9');
   session('x-none', '2026-10-25T10:00:00.000Z', null); // no anonymous id: not counted

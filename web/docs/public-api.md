@@ -18,8 +18,8 @@ Requests to `/api/*` are rate-limited per IP address (about 120 a minute); beyon
 
 ### Attribution
 
-If you show these numbers, please credit **Who's Bluffing** with a link to [whosbluffing.com](https://whosbluffing.com). Keep the note that anonymous IDs are not a precise count of individual people. Historical research definitions are preserved on the [research page](/research#numbers).
+If you show these numbers, please credit **Who's Bluffing** with a link to [whosbluffing.com](https://whosbluffing.com). Keep the note that anonymous IDs are not a precise count of individual people.
 
 ## Open data
 
-The public player-count endpoint contains no answers or player IDs. The release plan is fixed in the pre-registration: anonymous row-level data for both studies, with every exclusion flag kept, will be published on OSF, Hugging Face and Kaggle under CC BY-NC 4.0, each release with a data card that describes how it was collected, its sample bias and what it should not be used for. Classroom sessions are pooled without class codes. Details: [Open data on the research page](/research#data) and the [pre-registration](https://github.com/ethan-rong/whos-bluffing/blob/main/prereg/PREREG.md).
+The public player-count endpoint contains no answers or player IDs. The release plan: anonymous row-level data for both studies, with every exclusion flag kept, will be published on OSF, Hugging Face and Kaggle under CC BY-NC 4.0, each release with a data card that describes how it was collected, its sample bias and what it should not be used for. Classroom sessions are pooled without class codes. Details: [Open data on the research page](/research#data).

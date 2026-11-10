@@ -48,5 +48,5 @@ CREATE TABLE anki_agg (
   rows INTEGER NOT NULL
 );
 
--- Anki contributors are reported next to MAU, never inside it (PREREG's MAU counts plays). Written by the KPI job.
+-- Anki contributors are reported next to MAU, never inside it (MAU counts plays). Written by the KPI job.
 ALTER TABLE kpi ADD COLUMN anki_contributors_30d INTEGER NOT NULL DEFAULT 0;

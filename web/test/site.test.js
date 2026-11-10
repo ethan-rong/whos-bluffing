@@ -131,13 +131,6 @@ test('Discord install buttons keep personal commands separate from server permis
   assert.equal(disabled.server.hidden, true);
 });
 
-test('/research quotes the MAU and community definitions from PREREG word for word', () => {
-  const prereg = read(new URL('../../prereg/PREREG.md', import.meta.url)).replace(/\*\*/g, '');
-  const research = read(new URL('research.html', PUBLIC));
-  assert.ok(research.includes(`<p>${prereg.match(/^- (MAU: .*)$/m)[1]}</p>`), 'MAU definition');
-  assert.ok(research.includes(`<p>${prereg.match(/^- (Communities: .*)$/m)[1]}</p>`), 'Communities definition');
-});
-
 test('homepage total: show from 100 players', () => {
   assert.equal(MIN_PLAYERS, 100);
   assert.equal(playedLine(null), null); // the stats request failed

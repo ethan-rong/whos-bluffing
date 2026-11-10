@@ -57,9 +57,9 @@ Open **http://127.0.0.1:8788**. Requires Node 22 and Python 3.9+.
 
 ## The research question
 
-Most people are surer than they are right. The game shows you by how much, every day, in a minute. It is also a pre-registered study: **does daily feedback make people better calibrated?**
+Most people are surer than they are right. The game shows you by how much, every day, in a minute. It is also an open study: **does daily feedback make people better calibrated?**
 
-Anonymous answers are released under CC BY-NC 4.0 with a data card. The [pre-registration](prereg/PREREG.md) records the study design.
+Anonymous answers are released under CC BY-NC 4.0 with a data card.
 
 ## Inside the repository
 
@@ -69,7 +69,6 @@ Anonymous answers are released under CC BY-NC 4.0 with a data card. The [pre-reg
 | [`discord/`](discord/), [`slack/`](slack/) | The Discord and Slack apps: Cloudflare Workers, no dependencies. |
 | [`items/`](items/), [`daily/`](daily/) | Authored questions, Wikidata comparisons, and historical round schedules. |
 | [`analysis/`](analysis/) | Pipeline, metric definitions shared by JS and Python, fact checks. |
-| [`prereg/`](prereg/) | The frozen pre-registration. |
 | [`brand/`](brand/) | Logo kit. |
 
 ## Licence
