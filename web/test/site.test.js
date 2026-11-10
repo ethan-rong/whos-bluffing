@@ -62,7 +62,7 @@ test('markup is CSP-safe and the sitemap lists only indexable pages', () => {
     assert.doesNotMatch(h, /\sstyle=|<style|\son[a-z]+=/i, `${file}: inline style or event handler`);
   }
   const listed = [...read(new URL('sitemap.xml', PUBLIC)).matchAll(/<loc>https:\/\/whosbluffing\.com(\/[^<]*)<\/loc>/g)].map((m) => m[1]).sort();
-  const expected = [...pages.filter((f) => !/<meta name="robots" content="[^"]*noindex/.test(read(new URL(f, PUBLIC)))).map(pathOf), '/dares'].sort();
+  const expected = pages.filter((f) => !/<meta name="robots" content="[^"]*noindex/.test(read(new URL(f, PUBLIC)))).map(pathOf).sort();
   assert.deepEqual(listed, expected);
 });
 

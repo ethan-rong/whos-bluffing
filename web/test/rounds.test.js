@@ -109,6 +109,23 @@ test('round ids: rk-/dq- dates and 12-character quick ids; everything else is in
   for (const bad of ['rk-2026-02-30', 'xx-2026-11-10', 'abcdefghijkl', 'ABCDEFGHJK2', null, 42]) assert.equal(parseRoundId(bad), null, String(bad));
 });
 
+test('old dare round ids (dr-<slug>) get the clean bad round_id answer everywhere, never an exception', async () => {
+  // Arrange
+  const db = openD1();
+  const roundId = 'dr-altman';
+  const player = { round_id: roundId, anon_id: anon('d'), surface: 'web' };
+  // Act
+  const replies = [
+    await getRound(db, DATA, { round_id: roundId }, NOW),
+    await answer(db, DATA, { ...player, item_id: RANKED[0], choice: 0, conf: 80 }, NOW),
+    await complete(db, DATA, player, NOW, ORIGIN),
+    await compare(db, DATA, roundId, anon('d'), 'abcdefghij', NOW),
+  ];
+  // Assert
+  assert.equal(parseRoundId(roundId), null); // the /c/<round>/<token> page answers its branded 404 for this
+  for (const r of replies) assert.deepEqual(r, { status: 400, body: { error: 'bad round_id' } });
+});
+
 test('GET ranked: today\'s ten for everyone, prompts and names only, never early', async () => {
   const db = openD1();
   const r = await getRound(db, DATA, { mode: 'ranked' }, NOW);

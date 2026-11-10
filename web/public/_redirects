@@ -3,3 +3,5 @@
 /class/d/* /class 200
 /community /discord 301
 /community.html /discord 301
+/dares / 302
+/dare/* / 302

@@ -952,25 +952,6 @@ h3 { margin-top: 20px; }
 
 /* The member in the Discord mock is the owner, with his real avatar. */
 img.dc-avatar { display: block; object-fit: cover; }
-/* dares */
-.dare-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 34em; }
-.dare-status, .dare-rival { max-width: 34em; }
-.dare-status p, .dare-rival p { margin: 0; }
-.dare-status p + p { margin-top: 6px; }
-.dare-scroll { overflow-x: auto; }
-.dare-table { min-width: 640px; }
-/* dare avatars: the person's portrait (or initials) beside the status line and in the board's person column. Grey and
-   faded until they have played (and tilted on their page); full colour and straight once they have (_dares.js face). */
-.dare-status { display: flex; align-items: center; gap: 16px; }
-.dare-face { flex: none; width: 64px; height: 64px; border-radius: 50%; object-fit: cover; filter: grayscale(1); opacity: 0.6; transform: rotate(-3deg); }
-.dare-face.is-played { filter: none; opacity: 1; transform: none; }
-.dare-face-sm { display: inline-block; width: 32px; height: 32px; margin-right: 10px; vertical-align: middle; transform: none; }
-.dare-mono { display: inline-grid; place-items: center; background: color-mix(in srgb, var(--text) 10%, var(--surface)); color: var(--text); font-size: 22px; font-weight: 700; line-height: 1; }
-.dare-mono.dare-face-sm { font-size: 12px; }
-.dare-table th[scope="row"] { white-space: nowrap; }
-.dare-credits { font-size: 13px; }
-.dare-credits p { margin: 0; }
-.dare-credits ul { margin: 4px 0 0; padding: 0; list-style: none; }
 
 /* A single public product metric, set large on the status page */
 .player-status { min-height: 65vh; max-width: calc(760px + 2 * var(--gut)); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding-block: 64px; }

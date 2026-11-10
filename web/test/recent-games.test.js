@@ -91,8 +91,8 @@ test('recent games: corruption, partial rounds and unsafe URLs are ignored indep
   }
 });
 
-test('recent games: safe local URLs, negative scores, ranked rounds and dare snapshots survive reload', (t) => {
-  storage(t);
+test('recent games: safe local URLs, negative scores and ranked rounds survive reload; saved dare entries drop out', (t) => {
+  const data = storage(t);
   const quick = fixture();
   quick.result.score = -100;
   quick.result.challenge_url = 'http://localhost:8788/c/AAAAAAAAAAAA/abcdefghij';
@@ -108,12 +108,10 @@ test('recent games: safe local URLs, negative scores, ranked rounds and dare sna
   delete dare.round.pack;
   delete dare.round.difficulty;
   Object.assign(dare.result, { challenge_url: '/dare/acme', rank: 1, players: 5, dare: { slug: 'acme', name: 'Ada Acme', address: 'Ms. Acme' } });
-  const corruptDare = structuredClone(dare);
-  corruptDare.round.pack = { toString: null };
-  assert.equal(save(corruptDare), false, 'optional dare metadata must be safe to render when present');
-  assert.equal(save(dare), true);
-  assert.equal(recentGame('dr-acme').result.dare.address, 'Ms. Acme');
-  assert.equal(recentGames().length, 3);
+  assert.equal(save(dare), false);
+  data.set(KEY, JSON.stringify([dare, ...JSON.parse(data.get(KEY))])); // saved before the dare board was removed
+  assert.equal(recentGame('dr-acme'), null);
+  assert.equal(recentGames().length, 2);
 });
 
 test('recent games: unavailable or full storage never interrupts completion or reports a false save', (t) => {
@@ -126,20 +124,18 @@ test('recent games: unavailable or full storage never interrupts completion or r
   assert.deepEqual(recentGames(), []);
 });
 
-test('recent games: actual quick and dare completions reopen with original answers and sources intact', async (t) => {
+test('recent games: actual quick completions reopen with original answers and sources intact', async (t) => {
   storage(t);
   const read = (path) => JSON.parse(readFileSync(new URL(path, import.meta.url), 'utf8'));
-  const dares = read('../functions/_dares.json');
   const data = loadRounds(read('../functions/_pool.json'), read('../functions/_pairs.json'), read('../functions/_rounds.json'),
-    { dares, curated: read('../../items/quick_curated.json').items });
+    { curated: read('../../items/quick_curated.json').items });
   const db = openD1();
   t.after(() => db.sqlite.close());
   const now = new Date(completedAt);
-  for (const params of [{ mode: 'quick', pack: 'history', difficulty: 'normal' }, { round_id: `dr-${dares[0].slug}` }]) {
+  for (const params of [{ mode: 'quick', pack: 'history', difficulty: 'normal' }]) {
     const fresh = await getRound(db, data, params, now);
     assert.equal(fresh.status, 200);
     const round = { ...fresh.body, answers: {}, total: 0 };
-    if (round.mode === 'dare') { delete round.pack; delete round.difficulty; }
     const player = { anon_id: 'a'.repeat(22), surface: 'web', round_id: round.round_id };
     for (const item of round.items) {
       const reply = await answer(db, data, { ...player, item_id: item.id, choice: 0, conf: 80 }, now);
@@ -153,11 +149,6 @@ test('recent games: actual quick and dare completions reopen with original answe
     assert.equal(rememberGame(round, finished.body, completedAt), true);
     assert.deepEqual(recentGame(round.round_id).round, round);
     assert.equal(recentGame(round.round_id).result.score, finished.body.score);
-    if (round.mode === 'dare') {
-      assert.equal(recentGame(round.round_id).result.players, 1);
-      assert.equal(recentGame(round.round_id).result.rank, 1);
-      assert.equal(recentGame(round.round_id).result.dare.slug, dares[0].slug);
-    }
   }
-  assert.equal((await db.prepare('SELECT COUNT(*) AS n FROM round_plays').first()).n, 2);
+  assert.equal((await db.prepare('SELECT COUNT(*) AS n FROM round_plays').first()).n, 1);
 });

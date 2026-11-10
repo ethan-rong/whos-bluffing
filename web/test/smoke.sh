@@ -133,6 +133,11 @@ for p in /community /community.html; do
   [ "$META" = "301 $BASE/discord" ] || fail "$p should redirect to the Discord app page" "$META"
   pass "$p -> /discord (no hosted community server)"
 done
+for p in /dares /dare/altman; do
+  META=$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' "$BASE$p")
+  [ "$META" = "302 $BASE/" ] || fail "$p should redirect home" "$META"
+  pass "$p -> / (the dare board is gone)"
+done
 content /status '<script type="module" src="/status.js"></script>' 'status page and its script'
 content /press '<p class="boilerplate">' 'press kit'
 content /changelog '<h1 id="changelog">Changelog</h1>' 'changelog (generated from CHANGELOG.md)'
@@ -870,66 +875,5 @@ CHECK=$(node -e '
   console.log("one claim: round, board, lab, day, difficulty, score, overconfidence, time, no anonymous id; lab_agg moved from anthropic to openai");
 ' "$STATE/labs_db.json" "$LROUND") || fail "lab tables" "$CHECK"
 pass "lab tables ($CHECK)"
-# After everything else too: the dare players are new web ids. The round can serve fewer than ten pairs if a pair shares
-# a value retired above (today's ranked AI pair), so the checks use the pairs it serves (N).
-echo "== dares: dr-altman (fixed pairs, answers, complete with rank), GET /api/dare/altman and /api/dares, the pages /dare/altman and /dares"
-req GET "/api/round?round_id=dr-altman"
-expect "GET /api/round?round_id=dr-altman -> the dare's fixed pairs, mode dare, pack ai, brutal, Mr. Altman" 200 \
-  'const d = require("./functions/_dares.json").find((x) => x.slug === "altman"); r.round_id === "dr-altman" && r.mode === "dare" && r.pack === "ai" && r.difficulty === "brutal" && r.dare.address === "Mr. Altman" && r.items.length >= 8 && r.items.every((i) => d.items.includes(i.id)) && !/wikidata|value|truth/.test(JSON.stringify(r))'
-printf '%s' "$BODY" > "$STATE/dare.json"
-N=$(node -e 'process.stdout.write(String(JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")).items.length))' "$STATE/dare.json")
-export N
-DARE1=smokeDareOneDDDDDDDDDD
-DARE2=smokeDareTwoDDDDDDDDDD
-play_round "$STATE/dare.json" "$DARE1" web 1111111111 90
-req POST /api/round/complete "$(cbody dr-altman "$DARE1" web)"
-expect "complete dr-altman (all right at 90%) -> rank 1 of 1, the dare page as its link, the share text naming Sam Altman" 200 \
-  'r.score === 96 * Number(process.env.N) && r.rank === 1 && r.players === 1 && r.dare.address === "Mr. Altman" && r.challenge_url === `http://127.0.0.1:${process.env.PORT}/dare/altman` && r.share_text === `I scored ${r.score} on the ten questions written for Sam Altman. He hasn\x27t taken it yet. 127.0.0.1:${process.env.PORT}/dare/altman`'
-play_round "$STATE/dare.json" "$DARE2" web 0000000000 60
-req POST /api/round/complete "$(cbody dr-altman "$DARE2" web)"
-expect "a second player (all wrong at 60%) -> rank 2 of 2" 200 'r.score === -44 * Number(process.env.N) && r.rank === 2 && r.players === 2'
-req POST /api/round/complete "$(cbody dr-altman "$DARE1" web)"
-expect "the first player's repeat complete -> the same play, rank 1 of 2" 200 'r.score === 96 * Number(process.env.N) && r.rank === 1 && r.players === 2'
-req GET /api/dare/altman
-expect "GET /api/dare/altman -> 2 players, best, average, overconfidence +25, open, no score of his, the rival (musk, when on the board)" 200 \
-  'r.slug === "altman" && r.name === "Sam Altman" && r.org === "OpenAI" && r.players === 2 && r.best === 96 * Number(process.env.N) && r.mean_score === 26 * Number(process.env.N) && r.mean_overconfidence === 25 && r.status === "open" && r.their_score === null && r.issued === "2026-10-05" && (r.rival === null || r.rival.slug === "musk") && r.as_of'
-req GET /api/dares
-expect "GET /api/dares -> every dare on the board, most played first (altman, 2)" 200 \
-  'r.dares[0].slug === "altman" && r.dares[0].players === 2 && r.dares.every((d, k) => !k || d.players <= r.dares[k - 1].players) && r.dares.length === require("./functions/_dares.json").filter((d) => d.status !== "removed").length && Object.keys(r.dares[0]).join() === "slug,name,address,org,status,players,mean_score,their_score,issued"'
-req GET /api/dare/nobody
-expect "GET /api/dare/nobody -> 404" 404 'r.error === "unknown dare"'
-req GET /api/dare/Not_A_Slug
-expect "GET /api/dare/<malformed> -> 400" 400 'r.error === "bad slug"'
-curl -s -D "$STATE/dare_h.txt" -o "$STATE/dare.html" -w '%{http_code}' "$BASE/dare/altman" > "$STATE/dare_status.txt"
-DPAGE=$(cat "$STATE/dare.html")
-[ "$(cat "$STATE/dare_status.txt")" = 200 ] && [[ "$DPAGE" == *'<h1 id="hero-title">Ten questions about OpenAI, written for Mr. Altman</h1>'* ]] \
-  && [[ "$DPAGE" == *'<meta property="og:title" content="Ten questions about OpenAI, written for Mr. Altman | Who&#39;s Bluffing?">'* ]] \
-  && [[ "$DPAGE" == *'<meta property="og:description" content="Same ten for everyone. Mr. Altman: no score yet.">'* ]] \
-  && [[ "$DPAGE" == *'<meta property="og:url" content="https://whosbluffing.com/dare/altman">'* ]] \
-  && [[ "$DPAGE" == *'<p>Mr. Altman: no score yet</p>'* ]] && [[ "$DPAGE" == *'<b>2</b><span>people have taken it</span>'* ]] \
-  && [[ "$DPAGE" == *'<script type="module" src="/app.js"></script>'* ]] && [[ "$DPAGE" == *'and it comes off within a day.'* ]] \
-  || fail "GET /dare/altman -> 200 with its Open Graph tags, heading, numbers and status" "$(head -c 400 "$STATE/dare.html")"
-pass "GET /dare/altman -> 200: og:title, og:description and og:url of its own, the heading, 2 people, \"Mr. Altman: no score yet\", the game, the opt-out line"
-grep -qi '^content-security-policy: default-src' "$STATE/dare_h.txt" && grep -qi '^x-content-type-options: nosniff' "$STATE/dare_h.txt" \
-  && grep -qi '^content-type: text/html' "$STATE/dare_h.txt" || fail "dare page security headers" "$(cat "$STATE/dare_h.txt")"
-pass "the dare page carries the CSP, nosniff and text/html headers itself (a Function response)"
-[[ "$DPAGE" == *'<img class="dare-face" src="/img/dares/altman.jpg" alt="Sam Altman" width="64" height="64">'* ]] && [[ "$DPAGE" == *'<div class="dare-credits fine"><p>Photo credits</p>'* ]] \
-  || fail "GET /dare/altman -> his portrait (grey while open) and the photo credits" "$(head -c 400 "$STATE/dare.html")"
-pass "GET /dare/altman -> his portrait (grey while open) and the photo credits"
-META=$(curl -s -o /dev/null -w '%{http_code} %{content_type}' "$BASE/img/dares/altman.jpg")
-[[ "$META" == "200 image/jpeg"* ]] || fail "GET /img/dares/altman.jpg -> 200 image/jpeg" "$META"; pass "GET /img/dares/altman.jpg -> 200 image/jpeg (a static asset)"
-content /dares '<h1>The dare board</h1>' 'the dare board'
-content /dares '<a href="/dare/altman">Sam Altman</a></th><td>OpenAI</td><td>2</td>' 'the dare board: Sam Altman, OpenAI, 2 people'
-req GET /dare/nobody
-[ "$STATUS" = 404 ] && [[ "$BODY" == *'<h1>Page not found</h1>'* ]] || fail "GET /dare/nobody -> branded 404" "$BODY"
-pass "GET /dare/nobody -> 404 with the branded page"
-"${WRANGLER[@]}" d1 execute whosbluffing --local --persist-to "$STATE" --json --command \
-  "EXPLAIN QUERY PLAN SELECT COUNT(*) AS players, MAX(score) AS best, AVG(score) AS mean, AVG(overconf) AS overconf FROM round_plays WHERE round_id = 'dr-altman';
-   EXPLAIN QUERY PLAN SELECT COUNT(*) AS players, COALESCE(SUM(score > 0), 0) AS above FROM round_plays WHERE round_id = 'dr-altman';
-   EXPLAIN QUERY PLAN SELECT round_id, COUNT(*) AS players, AVG(score) AS mean FROM round_plays WHERE round_id IN ('dr-altman', 'dr-clark') GROUP BY round_id" \
-  > "$STATE/dare_db.json" 2>/dev/null || fail "d1 execute (dare queries)"
-node -e 'const plans = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")).map((x) => x.results.map((p) => p.detail).join(" | ")); process.exit(plans.length === 3 && plans.every((d) => /SEARCH round_plays USING (COVERING )?INDEX idx_round_plays_round/.test(d) && !/\bSCAN\b/.test(d)) ? 0 : 1)' "$STATE/dare_db.json" \
-  || fail "the dare queries should read only their rounds' plays" "$(cat "$STATE/dare_db.json")"
-pass "the dare queries read only their rounds' plays (SEARCH round_plays USING INDEX idx_round_plays_round)"
 
 echo "smoke: $PASSED checks passed, 0 failed"
