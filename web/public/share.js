@@ -197,8 +197,23 @@ const ROUND_SIZES = {
   wide: { w: 1200, h: 630, pad: 60, qr: 210, brand: 34, kicker: 28, type: 92, score: 60, line: 32, foot: 26 },
 };
 
-// lines: {type, score, line, cta}; url: the challenge link (QR), shown as the bare host.
-export function drawRoundCard(kind, { lines, url }) {
+// The result type's emblem (brand/emblems) sits on a tile in the type card's colour (light tokens, styles.css), in the
+// right column above the QR.
+const TYPE_TILES = { bluffer: '#B42318', hot_headed: '#8A5A00', calibrated: '#1A7F37', modest: '#2F5BFF', hedger: '#5B6472' };
+const TILE_GAP = 24;
+const TILE_ART = 0.86; // the emblem's share of its tile
+
+function drawEmblem(g, { key, img }, x, y, size) {
+  g.fillStyle = TYPE_TILES[key];
+  g.beginPath();
+  if (g.roundRect) g.roundRect(x, y, size, size, size * 0.18); else g.rect(x, y, size, size);
+  g.fill();
+  const art = size * TILE_ART;
+  g.drawImage(img, x + (size - art) / 2, y + (size - art) / 2, art, art);
+}
+
+// lines: {type, score, line, cta}; url: the challenge link (QR), shown as the bare host; emblem: {key, img} or null.
+export function drawRoundCard(kind, { lines, url, emblem = null }) {
   const z = ROUND_SIZES[kind];
   const canvas = document.createElement('canvas');
   canvas.width = z.w;
@@ -209,12 +224,16 @@ export function drawRoundCard(kind, { lines, url }) {
   g.textBaseline = 'top';
   drawBrand(g, z.pad, z.pad, z.brand);
   drawQr(g, url, z.w - z.pad - z.qr, z.h - z.pad - z.qr, z.qr);
+  const qrX = z.w - z.pad - z.qr;
+  if (emblem) drawEmblem(g, emblem, qrX, z.h - z.pad - 2 * z.qr - TILE_GAP, z.qr);
   const textW = z.w - 2 * z.pad - (kind === 'wide' ? z.qr + z.pad : 0);
+  // On the square card the score and the line share the tile's band, so they wrap before it.
+  const rowW = emblem ? Math.min(textW, qrX - z.pad * 1.5) : textW;
   let y = z.pad + z.brand * 2;
   y = drawLines(g, layout(g, lines.kicker, textW, z.kicker, 600), z.pad, y, z.kicker, 600, COLORS.muted) + z.kicker * 0.2;
   y = drawLines(g, layout(g, lines.type, textW, z.type, 600, DISPLAY), z.pad, y, z.type, 600, COLORS.fg, DISPLAY);
-  y = drawLines(g, layout(g, lines.score, textW, z.score, 600, DISPLAY), z.pad, y + z.score * 0.1, z.score, 600, COLORS.accent, DISPLAY);
-  drawLines(g, layout(g, lines.line, textW, z.line, 400), z.pad, y + z.line * 0.3, z.line, 400, COLORS.fg);
+  y = drawLines(g, layout(g, lines.score, rowW, z.score, 600, DISPLAY), z.pad, y + z.score * 0.1, z.score, 600, COLORS.accent, DISPLAY);
+  drawLines(g, layout(g, lines.line, rowW, z.line, 400), z.pad, y + z.line * 0.3, z.line, 400, COLORS.fg);
   const footW = z.w - 3 * z.pad - z.qr;
   const hostY = z.h - z.pad - z.foot;
   const cta = layout(g, lines.cta, footW, z.foot, 600);
@@ -225,7 +244,7 @@ export function drawRoundCard(kind, { lines, url }) {
 
 // The share panel of a finished round: card preview (square/wide), copy text, native share, download, copy image.
 // onShare(action) is called once per share action (the /api/event counter).
-export function renderRoundShare(ctx, el, { lines, copy, url, onShare }) {
+export function renderRoundShare(ctx, el, { lines, copy, url, onShare, typeKey = null }) {
   const { t } = ctx;
   let kind = 'square';
   let canvas = null;
@@ -243,10 +262,15 @@ export function renderRoundShare(ctx, el, { lines, copy, url, onShare }) {
   const img = el.querySelector('img');
   attachTilt(el.querySelector('.card-tilt')); // the preview leans towards the pointer
   const say = (s) => { el.querySelector('.msg').textContent = s; };
+  const art = new Image(); // the type's emblem; the card draws without it until it loads, or if it fails
   const draw = () => {
-    canvas = drawRoundCard(kind, { lines, url });
+    canvas = drawRoundCard(kind, { lines, url, emblem: art.naturalWidth ? { key: typeKey, img: art } : null });
     img.src = canvas.toDataURL('image/png');
   };
+  if (TYPE_TILES[typeKey]) {
+    art.onload = draw;
+    art.src = `/img/types/${typeKey}.webp`;
+  }
   for (const b of el.querySelectorAll('.seg button')) {
     b.onclick = () => {
       kind = b.dataset.k;

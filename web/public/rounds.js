@@ -387,6 +387,7 @@ ${counters(t, res)}
     lines: { kicker: st.mode === 'ranked' ? t('rounds.ranked') : t('rounds.card_kicker'), type: typeName(res.type), score: t('rounds.card_score', { score: fmtTotal(res.score) }),
       line: t('rounds.score_sub', { accuracy: Math.round(res.accuracy), mean_conf: Math.round(res.mean_conf) }), cta: t('rounds.card_cta') },
     copy: withSideLine(copy, side?.shareLine(), res.challenge_url), url: res.challenge_url, onShare: () => event('share', st.round_id),
+    typeKey: TYPES[res.type],
   }));
   if (!res.dare) showVs(ctx, panel('vs-panel'), st.round_id, st.challenge ?? res.challenge_url.split('/').at(-1));
 }
