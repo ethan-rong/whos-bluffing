@@ -4,7 +4,7 @@
 // /class and /class/d/<secret> (their own HTML shells; _redirects maps the dashboard to class.html).
 import { html, api } from './ui.js';
 import { startTest } from './test.js';
-import { renderRoundHome, renderRounds, renderRoundResults, renderChallenge, renderDare } from './rounds.js';
+import { renderRoundHome, renderRounds, renderRoundResults, renderChallenge } from './rounds.js';
 import { renderBoard } from './labs.js';
 import { renderClassCreate, renderDashboard } from './class.js';
 import { renderPlayed, wireSurfaces, wirePause } from './home.js';
@@ -88,8 +88,6 @@ function route() {
   if (/^\/play\/?$/.test(p)) return renderRounds(ctx);
   if (/^\/results\/?$/.test(p)) return renderRoundResults(ctx);
   if (challenge) return renderChallenge(ctx, challenge[1], challenge[2]);
-  const dare = p.match(/^\/dare\/([a-z][a-z0-9-]{1,30})\/?$/); // functions/dare/[slug].js
-  if (dare) return renderDare(ctx, dare[1]);
   if (/^\/test\/?$/.test(p)) return renderTestLanding();
   if (/^\/labs\/?$/.test(p)) return renderBoard(ctx, 'ai');
   if (/^\/class\/?$/.test(p)) return renderClassCreate(ctx);

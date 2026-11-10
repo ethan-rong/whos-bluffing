@@ -19,10 +19,7 @@ function challengePath(value, round) {
     const url = new URL(value, 'https://whosbluffing.com');
     const local = ['localhost', '127.0.0.1', '[::1]'].includes(url.hostname);
     if (!(local || (url.origin === 'https://whosbluffing.com')) || url.username || url.password || url.search || url.hash) return null;
-    const valid = round.mode === 'dare'
-      ? url.pathname === `/dare/${round.round_id.slice(3)}`
-      : new RegExp(`^/c/${round.round_id}/[A-Za-z0-9_-]{10}$`).test(url.pathname);
-    return valid ? url.pathname : null;
+    return new RegExp(`^/c/${round.round_id}/[A-Za-z0-9_-]{10}$`).test(url.pathname) ? url.pathname : null;
   } catch { return null; }
 }
 
@@ -30,7 +27,7 @@ function validEntry(entry) {
   if (!object(entry)) return null;
   const { round, result, completedAt } = entry;
   if (!object(round) || !object(result) || !text(completedAt) || !Number.isFinite(Date.parse(completedAt))) return null;
-  const ids = { quick: /^[A-Z2-9]{12}$/, ranked: /^rk-\d{4}-\d{2}-\d{2}$/, dare: /^dr-[a-z][a-z0-9-]{1,30}$/ };
+  const ids = { quick: /^[A-Z2-9]{12}$/, ranked: /^rk-\d{4}-\d{2}-\d{2}$/ };
   if (!text(round.mode) || !Object.hasOwn(ids, round.mode) || !text(round.round_id) || !ids[round.mode].test(round.round_id) || !date(round.date)) return null;
   if (round.mode === 'ranked' && round.round_id !== `rk-${round.date}`) return null;
   if (round.mode === 'quick' && (round.pack == null || round.difficulty == null)) return null;
@@ -53,10 +50,6 @@ function validEntry(entry) {
   if (!number(result.score, -3000, 1000) || !number(result.accuracy, 0, 100) || !number(result.mean_conf, 50, 100)
     || !Number.isInteger(result.streak) || result.streak < 0 || !text(result.type) || !Object.hasOwn(TYPE_NAMES, result.type) || !text(result.share_text)
     || (result.roast != null && !text(result.roast))) return null;
-  if (round.mode === 'dare') {
-    if (!object(result.dare) || result.dare.slug !== round.round_id.slice(3) || ![result.dare.name, result.dare.address].every(text)
-      || !Number.isInteger(result.rank) || !Number.isInteger(result.players) || result.rank < 1 || result.players < result.rank) return null;
-  } else if (result.dare != null) return null;
   const path = challengePath(result.challenge_url, round);
   return path ? { round, result: { ...result, challenge_url: path }, completedAt: new Date(completedAt).toISOString() } : null;
 }

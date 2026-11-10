@@ -2,11 +2,10 @@
 // the Slack/Discord daily question, pair flags. Pairs and ranked days come in as data from loadRounds (unit tests use
 // fixtures; _rounds_data.js loads the bundled copies). Request functions return {status, body}.
 // Bounded: a request reads the round's own rows (<= 10 answers, its pairs and their items, one play, the day's <= 4
-// round_agg rows; a dare's complete counts that round's plays) and aggregates in SQL. The exception is retiring a pair: the affected ranked days are recomputed
+// round_agg rows) and aggregates in SQL. The exception is retiring a pair: the affected ranked days are recomputed
 // in SQL from their answers (once per retired pair).
 import { ANON_RE, RETIRE_FLAGS, todayUTC, addDays, isDate } from './_daily.js';
 import { randomString, CODE_ALPHABET, SECRET_ALPHABET } from './_util.js';
-import { DARE_RE, dareShareText } from './_dares.js';
 import { PACKS } from '../public/packs.js';
 
 export { PACKS };
@@ -75,14 +74,13 @@ const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 // written by sync-items); rounds: daily/rounds.json ({date: {ranked: [10 ids], question: id}}).
 // packLists[pack][difficulty][level] = the pair ids that difficulty may draw for that pack (lists = packLists.all);
 // available[difficulty] = the set of packs offered there (minPackPairs: a lower bar for small test fixtures).
-// dares: functions/_dares.json (the dare board's fixed rounds dr-<slug>, _dares.js), kept as data.dares by slug.
-export function loadRounds(pool, compact, rounds, { minPackPairs = MIN_PACK_PAIRS, dares = [], curated = [] } = {}) {
+export function loadRounds(pool, compact, rounds, { minPackPairs = MIN_PACK_PAIRS, curated = [] } = {}) {
   const items = new Map(pool.items.map((i) => [i.id, i]));
   const templates = new Map(compact.templates.map((t) => [`${t.category}|${t.unit}`, t]));
   const pairs = new Map();
   const packLists = Object.fromEntries(Object.keys(PACKS).map((k) => [k, Object.fromEntries(Object.keys(DIFFICULTIES).map((d) => [d, { easy: [], medium: [], hard: [] }]))]));
   const packsOf = new Map(); // category -> the packs it belongs to, `all` first
-  // Every category joins `all` except the Politics pack's: politics stays behind its own chip and the dare pages, out of
+  // Every category joins `all` except the Politics pack's: politics stays behind its own chip, out of
   // the default rounds that classrooms, Slack workspaces and Discord servers draw (owner's rule, 2026-10-05).
   for (const [k, pack] of Object.entries(PACKS)) for (const c of pack.categories ?? []) packsOf.set(c, [...(packsOf.get(c) ?? (c.startsWith('pol_') ? [] : ['all'])), k]);
   for (const [n, a, b, truth, level, band = 0, ref = 0, tier = 0] of compact.pairs) {
@@ -100,7 +98,7 @@ export function loadRounds(pool, compact, rounds, { minPackPairs = MIN_PACK_PAIR
     || fillable(spec, packLists[k][d], pairs, minPackPairs)))]));
   const entity = new Map([...items.values()].map((i) => [i.id, (i.replaces || i.source).match(/\/(Q\d+)#/)?.[1] ?? i.id]));
   // Adapt authored choices to the existing scoring, retirement and challenge paths. Their ids never overlap the
-  // generated bank, and they never enter ranked schedules or fixed dares. Text verdicts use the same reveal fields.
+  // generated bank, and they never enter ranked schedules. Text verdicts use the same reveal fields.
   for (const q of curated) {
     const ids = q.options.map((name, k) => {
       const id = `${q.id}-${k}`;
@@ -121,7 +119,7 @@ export function loadRounds(pool, compact, rounds, { minPackPairs = MIN_PACK_PAIR
     }
   }
   const data = { items, pairs, templates, lists, packLists, available, rounds, entity, rankedDatesByItem,
-    curated: curated.map((q) => q.id), dares: new Map(dares.map((d) => [d.slug, d])) };
+    curated: curated.map((q) => q.id) };
   // This authored-only pack needs a complete, varied round, not 200 generated comparisons.
   for (const pack of AUTHORED_PACKS) for (const d of Object.keys(DIFFICULTIES)) {
     available[d].delete(pack);
@@ -291,13 +289,11 @@ function truthView(data, p) {
   return { a_value: a.answer, b_value: b.answer, unit: a.en.unit, a_source: a.source, b_source: b.source, ...(fun && { fun }) };
 }
 
-// {kind: 'ranked'|'question', date}, {kind: 'dare', slug} or {kind: 'quick'}; null when the id has no valid shape.
+// {kind: 'ranked'|'question', date} or {kind: 'quick'}; null when the id has no valid shape.
 export function parseRoundId(id) {
   if (typeof id !== 'string') return null;
   const m = id.match(/^(rk|dq)-(\d{4}-\d{2}-\d{2})$/);
   if (m) return isDate(m[2]) ? { kind: m[1] === 'rk' ? 'ranked' : 'question', date: m[2] } : null;
-  const dare = id.match(DARE_RE);
-  if (dare) return { kind: 'dare', slug: dare[1] };
   return QUICK_RE.test(id) ? { kind: 'quick' } : null;
 }
 
@@ -314,14 +310,10 @@ function playerError(b) {
 }
 const communityOf = (b) => (b.surface === 'web' ? null : b.community ?? null);
 
-// The round's pair ids. Ranked rounds and daily questions come from the bundled days (never before their day), a dare
-// from the bundled dares (not a removed one); quick rounds from the rounds table.
+// The round's pair ids. Ranked rounds and daily questions come from the bundled days (never before their day); quick
+// rounds from the rounds table.
 async function resolveRound(db, data, roundId, now) {
   const r = parseRoundId(roundId);
-  if (r.kind === 'dare') {
-    const dare = data.dares.get(r.slug);
-    return dare && dare.status !== 'removed' ? { kind: 'dare', date: dare.issued, ids: dare.items, dare } : { error: err(404, 'unknown round') };
-  }
   if (r.kind === 'quick') {
     const row = await db.prepare('SELECT mode, date, items, pack, difficulty FROM rounds WHERE round_id = ?').bind(roundId).first();
     if (!row) return { error: err(404, 'unknown round') };
@@ -504,10 +496,8 @@ export async function getRound(db, data, params, now, rand = Math.random) {
     const round = await resolveRound(db, data, params.round_id, now);
     if (round.error) return round.error;
     const ids = await liveIds(db, data, round.ids);
-    const d = round.dare; // a dare also names its pack, difficulty and person
     return ok({ round_id: params.round_id, mode: round.kind, date: round.date,
-      ...(round.kind === 'quick' && { pack: round.pack, difficulty: round.difficulty }),
-      ...(d && { pack: d.pack, difficulty: d.difficulty, dare: { slug: d.slug, name: d.name, address: d.address } }), items: ids.map((id) => pairView(data, id)) });
+      ...(round.kind === 'quick' && { pack: round.pack, difficulty: round.difficulty }), items: ids.map((id) => pairView(data, id)) });
   }
   if (params.mode === 'ranked') {
     const day = data.rounds[today];
@@ -646,9 +636,6 @@ export async function settleQuestions(db, data, now, days = 35) {
 
 const PLAY_SQL = 'SELECT score, nickname, public_token, day, surface FROM round_plays WHERE anon_id = ? AND round_id = ?';
 const AGG_SQL = 'SELECT surface, players, score_hist, sum_overconf, calib FROM round_agg WHERE date = ?';
-// A dare round's completed plays and how many scored higher (idx_round_plays_round). ponytail: counts the round's rows
-// on every complete; add an index on round_plays(round_id, score) if one dare passes ~100,000 plays.
-const DARE_RANK_SQL = 'SELECT COUNT(*) AS players, COALESCE(SUM(score > ?), 0) AS above FROM round_plays WHERE round_id = ?';
 
 function completeBodyError(b) {
   const bad = playerError(b);
@@ -707,19 +694,14 @@ export async function complete(db, data, b, now, origin) {
   const s = scoreRound(live.map((id) => byItem.get(id)));
   const nickname = b.nickname == null ? null : b.nickname.trim().replace(/\s+/g, ' ');
   const aggregated = round.kind === 'ranked' && (round.date === today || round.date === addDays(today, -1));
-  // A dare's link is its page (the same ten for everyone), its share text names the person, and it ranks the play
-  // among the round's completed plays: rank = 1 + plays with a higher score.
-  const { dare } = round;
-  const rankDare = () => db.prepare(DARE_RANK_SQL).bind(s.score, b.round_id);
-  const respond = (token, streak, aggRows, rankRow) => {
-    const url = dare ? `${origin}/dare/${dare.slug}` : `${origin}/c/${b.round_id}/${token}`;
+  const respond = (token, streak, aggRows) => {
+    const url = `${origin}/c/${b.round_id}/${token}`;
     const { exact_overconf: _, ...scores } = s;
-    const body = { ...scores, streak, challenge_url: url, share_text: dare ? dareShareText(dare, s.score, new URL(origin).host) : shareText(s, url) };
+    const body = { ...scores, streak, challenge_url: url, share_text: shareText(s, url) };
     if (aggRows) {
       const { rank, players } = rankIn(aggRows, s.score);
       Object.assign(body, { rank_today: rank, players_today: players, today: statsBody(round.date, aggRows) }); // fresh, unlike the cached stats
     }
-    if (rankRow) Object.assign(body, { rank: rankRow.above + 1, players: rankRow.players, dare: { slug: dare.slug, name: dare.name, address: dare.address } });
     const roast = roastFor(data, b.round_id, live, byItem);
     if (roast) body.roast = roast;
     return ok(body);
@@ -729,12 +711,11 @@ export async function complete(db, data, b, now, origin) {
     if (!play) return null;
     const stmts = [db.prepare('SELECT streak FROM player_days WHERE anon_id = ? AND day = ?').bind(b.anon_id, play.day)];
     if (aggregated) stmts.push(db.prepare(AGG_SQL).bind(round.date));
-    if (dare) stmts.push(rankDare()); // never both: out[1] is one or the other
     if (nickname && nickname !== play.nickname) {
       stmts.push(db.prepare('UPDATE round_plays SET nickname = ? WHERE anon_id = ? AND round_id = ?').bind(nickname, b.anon_id, b.round_id));
     }
     const out = await db.batch(stmts);
-    return respond(play.public_token, out[0].results[0]?.streak ?? 0, aggregated ? out[1].results : null, dare ? out[1].results[0] : null);
+    return respond(play.public_token, out[0].results[0]?.streak ?? 0, aggregated ? out[1].results : null);
   };
   if (prior.results[0]) return replay();
 
@@ -766,10 +747,9 @@ export async function complete(db, data, b, now, origin) {
       db.prepare(AGG_SQL).bind(round.date),
     );
   }
-  if (dare) stmts.push(rankDare()); // after the insert, so the count includes this play
   try {
     const out = await db.batch(stmts);
-    return respond(token, out[2].results[0].streak, aggregated ? out[4].results : null, dare ? out[3].results[0] : null);
+    return respond(token, out[2].results[0].streak, aggregated ? out[4].results : null);
   } catch (e) {
     const raced = await replay(); // a concurrent complete won (the batch rolled back, nothing counted twice)
     if (!raced) throw e;

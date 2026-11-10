@@ -8,11 +8,6 @@ import { BOARDS } from './packs.js';
 export { fmtValue }; // the shared formatter: years, months, dollars, big counts (ui.js)
 export const fmtPoints = (p) => (p > 0 ? `+${p}` : p < 0 ? `−${-p}` : '0');
 
-// Dare rounds (/dare/<slug>): the rank tile's label ("#212" over "of 3,400 on Mr. Altman’s round"), and the line a
-// browser that has finished the dare sees instead of playing it again.
-export const dareRankLabel = (players, address) => `of ${players.toLocaleString('en-US')} on ${address}’s round`;
-export const dareDone = (score) => `You have taken this round: ${score < 0 ? `−${-score}` : score} points.`;
-
 // The squares pop in one after another (styles.css staggers them); misses shake once after their pop.
 export function resultGrid(st, t) {
   return html`<div class="result-grid" role="group" aria-label="${t('rounds.grid_label')}">${st.items.map((it, k) => {
@@ -70,8 +65,7 @@ export function wireGrid(root, st, t) {
 // One chip per side of the pack's board (packs.js BOARDS: labs for AI); a tap claims the round for
 // that side (POST /api/round/<key>), presses the chip and shows the mini board. The side is kept in this browser
 // (whosbluffing_lab) and later rounds of that pack claim it at once, showing "You're with {lab}" or
-// "Your side: {side}" and "change". Quick rounds only: a challenge round loads as pack All, and a dare round is not a
-// quick round (the API refuses it). board = the body of GET /api/<list>: {min_players, <list>: [{<key>, name, players,
+// "Your side: {side}" and "change". Quick rounds only: a challenge round loads as pack All. board = the body of GET /api/<list>: {min_players, <list>: [{<key>, name, players,
 // mean_score, mean_overconfidence}]}. Both boards use the lab-* class names (styles.css).
 export const boardOf = (st) => (st.mode === 'quick' && Object.hasOwn(BOARDS, st.pack ?? '') ? st.pack : null);
 const storeKey = (pack) => `whosbluffing_${BOARDS[pack].key}`;

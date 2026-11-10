@@ -212,6 +212,6 @@ test('boards: one board, the AI pack\'s; the Politics party board and the /parti
 
 test('end screen: a side block after an AI quick round only, never after a Politics one', () => {
   const st = (mode, pack) => ({ mode, pack });
-  assert.deepEqual([st('quick', 'politics'), st('quick', 'ai'), st('quick', 'all'), st('quick', 'geography'), st('dare', 'ai'), st('dare', 'politics'), st('ranked', undefined)].map(boardOf),
-    [null, 'ai', null, null, null, null, null]);
+  assert.deepEqual([st('quick', 'politics'), st('quick', 'ai'), st('quick', 'all'), st('quick', 'geography'), st('ranked', undefined)].map(boardOf),
+    [null, 'ai', null, null, null]);
 });

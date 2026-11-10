@@ -6,7 +6,6 @@
 //   items/pairs.json    -> web/functions/_pairs.json (compact: [n, a, b, truth, level, band, ref, tier] per pair) (rounds)
 //   daily/rounds.json   -> web/functions/_rounds.json                           (ranked rounds, daily questions)
 //   web/scripts/page.html -> web/functions/_page.json                          (template of the challenge page)
-//   dares/dares.json    -> web/functions/_dares.json (dares on the board), and new picks written back (build-dares.js)
 //   PRIVACY.md, TERMS.md, CHANGELOG.md, docs/api-*.md -> web/public/privacy.html, terms.html, changelog.html,
 //                          docs/api.html (sync-docs.js)
 //   the question count, pack chips, question list and command cards inside committed pages, press screenshots (sync-pages.js)
@@ -15,7 +14,6 @@ import { fileURLToPath } from 'node:url';
 import { isDate } from '../functions/_daily.js';
 import { syncDocs } from './sync-docs.js';
 import { syncPages } from './sync-pages.js';
-import { syncDares } from './build-dares.js';
 
 const ROOT = new URL('../../', import.meta.url);
 const TYPES = ['2afc', 'interval', 'attention'];
@@ -240,10 +238,6 @@ function main() {
   console.log(`synced items v${bank.version}: ${n('2afc')} two-alternative, ${n('interval')} interval, ${n('attention')} attention; `
     + `pool ${pool.items.length} items; schedule ${days.length} days${days.length ? ` (${days[0]} to ${days.at(-1)})` : ''}; `
     + `${pairs.pairs.length} pairs; ranked rounds ${Object.keys(rounds).length} days`);
-  const dares = syncDares({ pool, doc: pairs, rounds, server, compact });
-  if (dares.errors.length) fail('dares/dares.json', dares.errors);
-  console.log(`synced dares: ${dares.compact.length} on the board`);
-  for (const u of dares.unfilled) console.warn(`DARE NOT FILLED, left off the board: ${u.slug}: ${u.reason}`);
   console.log(`synced docs: ${syncDocs().join(', ')}`);
   const pages = syncPages({ pool: server, compact, rounds, pairs, curated: curated.items });
   console.log(`synced pages: ${pages.files.join(', ')} (${pages.count.toLocaleString('en-US')} servable pairs)`);
