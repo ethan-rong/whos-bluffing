@@ -11,8 +11,7 @@ anki/src/whosbluffing/user_files/
 .dev.vars
 .cache/
 
-# Agent worktrees (local only)
-.claude/worktrees/
+.claude/
 
 # Promotion drafts and tooling (local only, kept out of the public repo)
 posts/*
@@ -26,3 +25,4 @@ docs/server-targets.*
 USER_TODO.md
 x/
 briefs/
+web/NOTES.md

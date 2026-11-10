@@ -220,7 +220,7 @@ test('licence wording: the new footer line everywhere; no "open source" in web c
   const pkg = json('package.json');
   assert.equal(pkg.license, 'SEE LICENSE IN LICENSE');
   assert.equal(pkg.private, true);
-  for (const f of ['public/site.js', 'public/home.js', 'public/rounds.js', 'README.md', 'NOTES.md']) assert.doesNotMatch(read(f), /open[- ]source/i, f);
+  for (const f of ['public/site.js', 'public/home.js', 'public/rounds.js', 'README.md']) assert.doesNotMatch(read(f), /open[- ]source/i, f);
 });
 
 test('status page: verdicts for the server check and the KPI run; press files exist and images are sized from their PNGs', () => {
