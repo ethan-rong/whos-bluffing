@@ -340,8 +340,11 @@ ${saveFailed ? html`<p role="status">${t('rounds.recent_save_failed')}</p>` : ''
 <p class="round-kind">${roundLabel(t, st)}</p>
 ${resultGrid(st, t)}
 <section class="type-card type-${TYPES[res.type]} anim anim-flip" aria-label="${t('rounds.type_label')}">
-  <p class="type-name">${typeName(res.type)}</p>
-  <p class="type-line">${t(typeKey(res.type))}</p>
+  <div>
+    <p class="type-name">${typeName(res.type)}</p>
+    <p class="type-line">${t(typeKey(res.type))}</p>
+  </div>
+  <img class="type-emblem" src="/img/types/${TYPES[res.type] ?? 'calibrated'}.webp" alt="" width="320" height="320" decoding="async">
 </section>
 <div class="end-actions">
   <button type="button" data-act="challenge">${t('rounds.challenge')}</button>

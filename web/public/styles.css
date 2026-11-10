@@ -488,6 +488,9 @@ h3 { margin-top: 20px; }
 .type-card.type-calibrated { --tc: var(--hit-ink); --tc-ink: var(--surface); }
 .type-card.type-hedger { --tc: var(--muted); --tc-ink: var(--surface); }
 .type-card p { margin: 0; }
+/* The type's emblem (brand/emblems): decorative, to the right of the name */
+.type-card { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.type-emblem { flex: none; width: clamp(88px, 14vw, 132px); height: auto; margin: -12px -8px -12px 0; }
 .type-name { color: inherit; font-family: var(--font-display); font-size: clamp(40px, 6vw, 64px); font-weight: 600; letter-spacing: -0.045em; line-height: 1; }
 .type-card .type-line { margin-top: 10px; font-size: var(--fs-5); font-weight: 600; opacity: 0.92; }
 .roast { margin: 16px 0; padding: 16px 20px; border-radius: var(--r-lg) var(--r-lg) var(--r-lg) 4px; background: var(--ground-alt); font-size: var(--fs-4); font-style: italic; }

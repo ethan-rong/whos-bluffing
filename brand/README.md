@@ -18,6 +18,7 @@ card-table word, and the pip is the one piece that does not sit straight.
 | `png/icon-{16…1024}.png` | Raster exports of `icon.svg`. Discord wants 512 or larger; Slack 512–2000; GitHub 500 or larger. |
 | `png/icon-square-1024.png`, `png/icon-light-1024.png`, `png/mark-1024.png`, `png/mark-white-1024.png` | Raster exports of the other masters. |
 | `preview.png` | Icon at several sizes, the lockups, a home-screen mock. |
+| `emblems/{bluffer,hot_headed,calibrated,modest,hedger}.png` | 3D emblem for each result type (cards and chips, balloon, target, violet, safe), 1024 px on transparent. The site shows 320 px WebP copies (`web/public/img/types/`) on the result card. `emblems/make_emblems.py` rebuilds all of them in Blender. |
 
 ## Geometry (viewBox 0 0 38 44)
 
