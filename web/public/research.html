@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Open research | Who's Bluffing?</title>
-<meta name="description" content="The question Who's Bluffing studies, the pre-registered hypotheses, the numbers we publish and how the anonymous data will be released.">
+<meta name="description" content="The question Who's Bluffing studies, the hypotheses, the numbers we publish and how the anonymous data will be released.">
 <link rel="canonical" href="https://whosbluffing.com/research">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Who's Bluffing?">
 <meta property="og:title" content="Open research | Who's Bluffing?">
-<meta property="og:description" content="The question Who's Bluffing studies, the pre-registered hypotheses, the numbers we publish and how the anonymous data will be released.">
+<meta property="og:description" content="The question Who's Bluffing studies, the hypotheses, the numbers we publish and how the anonymous data will be released.">
 <meta property="og:url" content="https://whosbluffing.com/research">
 <meta property="og:image" content="https://whosbluffing.com/og.png">
 <meta property="og:image:width" content="1200">
@@ -59,30 +59,23 @@
   <p class="muted small">Brier, G. W. (1950). Verification of forecasts expressed in terms of probability. Monthly Weather Review, 78(1), 1–3. Gneiting, T., and Raftery, A. E. (2007). Strictly proper scoring rules, prediction, and estimation. Journal of the American Statistical Association, 102(477), 359–378.</p>
 
   <h2 id="hypotheses">Hypotheses</h2>
-  <p>Written down before launch and tested as written.</p>
   <ul>
     <li><strong>H1 · People are overconfident.</strong> Across players, average confidence is higher than the share of answers that are right; and the harder a question (the fewer people get it right), the more overconfident people are about it.</li>
     <li><strong>H2 · Format and difficulty.</strong> In the 5-minute full assessment, overconfidence is larger for 90% ranges than for two-choice questions; in rounds, overconfidence is reported for each level of difficulty.</li>
     <li><strong>H3 · Practice helps.</strong> Among players with at least 10 completed rounds, overconfidence falls and points rise over their first 20 rounds. The first rounds of players who keep playing are compared with those of players who stop early; if they differ, the effect is reported as applying to people who keep playing. A null result is reported as a null.</li>
   </ul>
 
-  <h2 id="numbers">Player counts and research definitions</h2>
+  <h2 id="numbers">Player counts</h2>
   <p>Only <a href="/status">Total Players</a> is public. It counts distinct anonymous IDs with a completed round or assessment, or a daily chat answer. DAU, MAU (rolling 30 days), and annual active users (rolling 365 days) are private. These count IDs, so one person can count more than once if they use different devices or platforms.</p>
-  <p>The following frozen research definitions are preserved for historical analyses. Product counts now deduplicate the same anonymous ID across surfaces and date chat activity by the answer time; see the dated amendment in the <a href="/changelog">changelog</a>.</p>
-  <blockquote><p>MAU: anonymous ids with ≥ 1 play — a completed round of 10 (ranked or quick), a completed full assessment, or an in-channel Slack or Discord answer to the daily question — in the trailing 30 days, summed across web, Slack and Discord without cross-surface deduplication (a person who plays on two surfaces counts twice; stated wherever MAU is reported). DAU likewise for one UTC day.</p></blockquote>
-  <blockquote><p>Communities: Slack workspaces, Discord servers and rooms with ≥ 1 play in the trailing 30 days, plus classrooms with ≥ 5 finished assessments; reported per platform and summed.</p></blockquote>
 
 
   <h2 id="data">Open data</h2>
   <p>Anonymous row-level data, with every exclusion flag kept rather than deleted, will be released on OSF, Hugging Face and Kaggle with a <a href="https://github.com/ethan-rong/whos-bluffing/blob/main/analysis/DATA_CARD.md">data card</a> describing how it was collected, its sample bias and what it should not be used for. Classroom sessions are pooled without class codes. The code for every analysis is in the <a href="https://github.com/ethan-rong/whos-bluffing/tree/main/analysis">analysis folder</a>.</p>
 
-  <h2 id="prereg">Pre-registration</h2>
-  <p>The full pre-registration (design, measures, hypotheses, exclusions, sample sizes and inference) is <a href="https://github.com/ethan-rong/whos-bluffing/blob/main/prereg/PREREG.md">prereg/PREREG.md on GitHub</a>. It was frozen on 2026-10-04, before the public launch on Monday 2026-10-05; any change since is logged in the <a href="https://github.com/ethan-rong/whos-bluffing/blob/main/CHANGELOG.md">changelog</a> with a date and a reason.</p>
-
   <h2 id="cite">How to cite</h2>
-  <p>Until the first dataset has its own identifier, please cite the project and the pre-registration:</p>
+  <p>Until the first dataset has its own identifier, please cite the project:</p>
   <pre><code>Who's Bluffing (2026). Who's Bluffing? A daily calibration game and open dataset.
-https://whosbluffing.com. Pre-registration: https://github.com/ethan-rong/whos-bluffing/blob/main/prereg/PREREG.md</code></pre>
+https://whosbluffing.com.</code></pre>
 </article>
 </main>
 <footer class="site-foot">

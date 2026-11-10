@@ -83,5 +83,5 @@ CREATE TABLE kpi (
   computed_at TEXT NOT NULL
 );
 
--- Full assessments carry the same browser id as the daily game, so MAU counts a web player once (PREREG).
+-- Full assessments carry the same browser id as the daily game, so MAU counts a web player once.
 ALTER TABLE sessions ADD COLUMN anon_id TEXT;

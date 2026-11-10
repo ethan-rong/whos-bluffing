@@ -116,7 +116,7 @@ content /class '<title>Create a class code' 'class shell'
 content /class/d/AAAAAAAAAAAAAAAAAAAAAAAA '<script type="module" src="/app.js">' 'class dashboard (rewritten to the class shell, URL kept)'
 content /slack "<h1 id=\"slack-title\">Who's Bluffing? for Slack</h1>" 'Slack page'
 content /teachers '<a class="button primary" href="/class">' 'teachers page'
-content /research '<h2 id="numbers">Player counts and research definitions</h2>' 'research page (definitions checked against PREREG in test/site.test.js)'
+content /research '<h2 id="numbers">Player counts</h2>' 'research page'
 content /support 'What to include in a bug report' 'support page'
 content /privacy '<h1 id="privacy">Privacy</h1>' 'privacy page (generated from PRIVACY.md)'
 content /terms '<h1 id="terms-of-use">Terms of use</h1>' 'terms page (generated from TERMS.md)'
@@ -731,7 +731,7 @@ expect "unknown event type -> 400" 400 'r.error'
 
 echo "== KPI job"
 req POST /api/submit "$(submission en ok '' "$ANON_A")"
-expect "full assessment with A's browser id (a play under PREREG)" 200 'r.session_id'
+expect "full assessment with A's browser id (counts as a play)" 200 'r.session_id'
 req POST /api/kpi/run
 expect "KPI run without the key -> 401" 401 'r.error === "unauthorized"'
 req POST /api/kpi/run '' 'x-kpi-key: wrong'

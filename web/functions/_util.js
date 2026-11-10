@@ -93,7 +93,7 @@ function answerError(a, it) {
 }
 
 // Validates a POST /api/submit body against the item bank (Map id -> item). Returns an error string or null.
-// Out-of-bounds ranges and fast answers are NOT rejected here: they are analysis-time exclusions (PREREG).
+// Out-of-bounds ranges and fast answers are NOT rejected here: they are analysis-time exclusions.
 export function validateSubmit(body, items) {
   if (!isObject(body)) return 'body must be a JSON object';
   if (body.lang !== 'en') return 'lang must be en';

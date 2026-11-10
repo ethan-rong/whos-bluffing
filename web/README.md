@@ -19,7 +19,7 @@ Every page is a static HTML file in `public/` with the same head (title, descrip
 | `/slack` | `slack.html` | Slack app, the same layout as `/discord` |
 | `/commands` | `commands.html` | Tabs Discord · Slack · Web shortcuts: searchable command cards (what it does, options, who can run it) and "Commands not working?" per platform; `#discord`, `#slack`, `#web` open a tab |
 | `/teachers` | `teachers.html` | Classroom mode pitch, 3 steps, privacy points, link to `/class` |
-| `/research` | `research.html` | The question, why honest confidence scores best (the quadratic rule; Brier 1950, Gneiting and Raftery 2007), H1–H3 in plain words, the MAU and community definitions quoted from PREREG, open data, pre-registration, how to cite |
+| `/research` | `research.html` | The question, why honest confidence scores best (the quadratic rule; Brier 1950, Gneiting and Raftery 2007), H1–H3 in plain words, player counts, open data, how to cite |
 | `/support` | `support.html` | GitHub issues, the FAQ (`#faq`, "Answers that may help"), what to put in a bug report |
 | `/community` | redirect | Redirects to `/discord` to add the game to an existing server |
 | `/status` | `status.html` + `status.js` | A centered Total Players count from `/api/players`; no private activity metrics |
@@ -115,7 +115,7 @@ cd web
 npm run tomorrow             # tomorrow's ranked round (UTC): the 10 pairs with both values and both sources, the answer, and the Slack/Discord question; `npm run tomorrow -- 2026-10-25` for any day
 ```
 
-Check each pair against its two sources. To swap one, replace its id in `daily/rounds.json` (one line per day) with another pair from `items/pairs.json` whose `ref_quality` is `referenced` (PREREG: ranked rounds use only items with a Wikidata reference or a fact-check; `npm run sync-items` refuses anything else), ideally the same difficulty and not used within 180 days, then `npm run sync-items` and deploy. A pair flagged by three players who answered it retires with both of its values; list retired pairs and items with
+Check each pair against its two sources. To swap one, replace its id in `daily/rounds.json` (one line per day) with another pair from `items/pairs.json` whose `ref_quality` is `referenced` (ranked rounds use only items with a Wikidata reference or a fact-check; `npm run sync-items` refuses anything else), ideally the same difficulty and not used within 180 days, then `npm run sync-items` and deploy. A pair flagged by three players who answered it retires with both of its values; list retired pairs and items with
 `npx wrangler d1 execute whosbluffing --remote --command "SELECT pair_id, retired_at FROM pair_runtime WHERE retired_at IS NOT NULL"` (and `items_runtime` for values) and swap them out of future days.
 
 Keep the days filled: `python3 analysis/items_pipeline/pairs.py` (from the repo root) appends days up to 120 ahead and never changes an existing day. Rules for new days: 10 referenced pairs (3 easy, 4 medium, 3 hard by ratio), at most 2 per category, plus one more referenced pair as the daily question; the 22 items are 22 different entities; no pair again within 180 days, no item within 25 days; well-known items first. It also regenerates `items/pairs.json`, keeping every existing pair's id and A/B order. Export `pair_runtime` to `daily/pair_runtime.json` and `items_runtime` to `daily/runtime.json` (`--json`) first and it skips retired pairs and items.
@@ -153,7 +153,7 @@ Player counts scan play history: the public total is cached for 60 seconds, whil
 
 Run `cd web && npm run players` using the existing authenticated Cloudflare CLI. It prints only `total_players`, `dau`, `mau`, `yau`, and the UTC `as_of` date. No password or admin key is stored in browser code. Alternatively, call `/api/kpi` with the existing `x-kpi-key` header.
 
-Total Players is all-time unique anonymous IDs with a completed round or assessment, or a daily chat answer. DAU uses today's UTC date; MAU uses the last 30 UTC dates including today; YAU uses the last 365. The same ID is deduplicated across sources; a person with multiple IDs can count more than once. Opening a page or answering only part of a round does not count. The public endpoint has a 60-second cache. Historical research definitions remain documented in PREREG and the dated changelog.
+Total Players is all-time unique anonymous IDs with a completed round or assessment, or a daily chat answer. DAU uses today's UTC date; MAU uses the last 30 UTC dates including today; YAU uses the last 365. The same ID is deduplicated across sources; a person with multiple IDs can count more than once. Opening a page or answering only part of a round does not count. The public endpoint has a 60-second cache.
 
 ## Recent games
 

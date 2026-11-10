@@ -14,4 +14,4 @@ Base: the web deployment (`https://<host>/api`). All JSON. Dates are UTC `YYYY-M
 
 Anonymous ids: web = random id in localStorage; Slack = hex sha256(team_id + ":" + user_id + ":" + SALT) computed in the Slack worker (SALT is a Worker secret that must never change); never the raw Slack ids. Server stores `players(anon_id, surface, first_seen, last_seen, plays)` and `plays(anon_id, date, surface, hits, completed_at)`.
 
-Surface notes: for `surface=slack`, `rt_ms` is the modal open-to-submit time divided by 5 (Slack gives no per-question timing) and is approximate; response-time exclusions in PREREG apply to the web surface only.
+Surface notes: for `surface=slack`, `rt_ms` is the modal open-to-submit time divided by 5 (Slack gives no per-question timing) and is approximate; response-time exclusions apply to the web surface only.

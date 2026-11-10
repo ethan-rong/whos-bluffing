@@ -1,9 +1,9 @@
-// KPI job (prereg/PREREG.md, "Metric definitions" and "Engagement numbers"), run once a day through POST /api/kpi/run.
+// KPI job (research metric and engagement numbers), run once a day through POST /api/kpi/run.
 // Historical research snapshots stay private. Product counts are defined separately below.
 //   Plays: a completed round of 10 (ranked or quick; counted on the day it was completed), an answer to the Slack or
 //        Discord daily question (on the question's day), a completed full assessment (on the day it was finished,
 //        surface "classroom" when it carried a class code, else "web"; only sessions with an anonymous id count).
-//        The retired daily range game (table plays) no longer counts: PREREG's play definition does not include it.
+//        The retired daily range game (table plays) no longer counts: it is not a play.
 //   MAU: anonymous ids with >= 1 play in the trailing 30 days, per surface, summed without cross-surface
 //        deduplication. DAU likewise for one UTC day.
 //   Communities: distinct community values (slack:…, discord:…, room:…) with >= 1 play in the trailing 30 days, per

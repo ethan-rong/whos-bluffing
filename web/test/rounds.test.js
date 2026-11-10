@@ -549,7 +549,7 @@ test('roasts: twenty lines that read for every comparison and none of the forbid
   }
 });
 
-// The real files: the PREREG rule and the shapes sync-items enforces, plus the scheduling rules pairs.py promises.
+// The real files: the referenced-items rule and the shapes sync-items enforces, plus the scheduling rules pairs.py promises.
 test('real items/pairs.json and daily/rounds.json: valid; ranked days famous and referenced; rules hold; bundle loads', () => {
   const read = (p) => JSON.parse(readFileSync(new URL(p, import.meta.url), 'utf8'));
   const pool = read('../../items/pool.json');

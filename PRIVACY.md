@@ -16,7 +16,7 @@ Who's Bluffing is an independent, unaffiliated, non-commercial project. No accou
 
 **Repeat visits:** your browser keeps a random id (not linked to you) so that later sessions from the same browser can be tied together. This is what makes streaks and the practice-effect analysis possible, and it lets the research analysis keep only one full assessment per browser. Clearing site data removes it.
 
-**What it is used for:** the results page you see, aggregate statistics on the public stats page, and a public research dataset (see `prereg/PREREG.md`). Row-level data is anonymous and will be released openly.
+**What it is used for:** the results page you see, aggregate statistics on the public stats page, and a public research dataset. Row-level data is anonymous and will be released openly.
 
 **Classroom mode:** an instructor who creates a class code sees only aggregates for that class, never individual rows, and sees nothing until at least 5 students have finished.
 

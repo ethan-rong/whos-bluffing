@@ -339,7 +339,7 @@ async function resolveRound(db, data, roundId, now) {
 // The file's first id stays first (from 2026-10-05 it is the day's AI question); the other nine are shuffled, same for everyone.
 const orderRanked = (ids, date) => (date >= '2026-10-05' ? [ids[0], ...ids.slice(1).sort((x, y) => hash(`${date}|${x}`) - hash(`${date}|${y}`))] : [...ids].sort((x, y) => hash(`${date}|${x}`) - hash(`${date}|${y}`)));
 
-// Statements that find which of the pair ids are retired or share a retired item (PREREG: a pair sharing a retired
+// Statements that find which of the pair ids are retired or share a retired item (a pair sharing a retired
 // value retires too); deadFrom reads their results.
 function deadStatements(db, data, ids) {
   const items = [...new Set(ids.flatMap((id) => [data.pairs.get(id).a_id, data.pairs.get(id).b_id]))];
@@ -944,7 +944,7 @@ export const countEvent = (db, type, now) => db.prepare('INSERT INTO events (day
 // --- POST /api/flag with a pair id ----------------------------------------------------------------------------------
 
 // Only someone who answered the pair in that round can flag it. The third distinct flag retires the pair and both its
-// values (PREREG: any pair sharing a retired value retires too), then recomputes every ranked day up to today that used
+// values (any pair sharing a retired value retires too), then recomputes every ranked day up to today that used
 // one of them.
 export async function flagPair(db, data, b, now) {
   if (!isObject(b) || typeof b.anon_id !== 'string' || !ANON_RE.test(b.anon_id)) return err(400, 'bad anon_id');

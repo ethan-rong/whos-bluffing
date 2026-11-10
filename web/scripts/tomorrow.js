@@ -1,7 +1,7 @@
 // npm run tomorrow [-- YYYY-MM-DD]: prints tomorrow's (UTC) ranked round, the ten pairs with both values and both
 // sources, plus the day's Slack/Discord question, for the nightly review. To swap a pair, replace its id in
 // daily/rounds.json (one line per day) with another referenced pair from items/pairs.json, then npm run sync-items
-// (it checks the PREREG rule) and deploy. review() prints the retired daily range game's five items (kept for its data).
+// (it checks that ranked rounds use only referenced or fact-checked items) and deploy. review() prints the retired daily range game's five items (kept for its data).
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { addDays, dayNumber, todayUTC, isDate } from '../functions/_daily.js';

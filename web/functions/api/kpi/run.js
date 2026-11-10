@@ -13,6 +13,6 @@ export const onRequestPost = safe(async ({ request, env }) => {
   if (!isDate(asOf) || asOf > todayUTC()) return fail(400, 'as_of must be a UTC date no later than today');
   const now = new Date();
   await settleQuestions(env.DB, ROUNDS, now);
-  await runKpi(env.DB, asOf, now); // retain the preregistered research snapshots privately
+  await runKpi(env.DB, asOf, now); // retain the research snapshots privately
   return json(await playerCounts(env.DB, asOf), 200, { 'cache-control': 'no-store' });
 });

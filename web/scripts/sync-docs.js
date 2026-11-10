@@ -19,7 +19,7 @@ export const DOCS = [
   { src: ['web/docs/public-api.md', 'docs/api-rounds.md', 'docs/api-daily.md'], out: 'public/docs/api.html', path: '/docs/api', title: "API | Who's Bluffing?",
     description: "The JSON API behind Who's Bluffing: public reads with CORS, rate limits, the rounds contract and the daily game's endpoints." },
   { src: ['CHANGELOG.md'], out: 'public/changelog.html', path: '/changelog', title: "Changelog | Who's Bluffing?",
-    description: "Dated changes to Who's Bluffing and to its pre-registered study, each with its reason." },
+    description: "Dated changes to Who's Bluffing, each with its reason." },
 ];
 
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');

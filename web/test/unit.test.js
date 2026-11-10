@@ -399,19 +399,3 @@ test('rounds UI: the newest 300 seen pairs, oldest first; signed points; a strin
   assert.match(svg, /<title>500 to 599: 1<\/title>/);
   assert.equal(String(scoreChart({ ...stats, score_hist: Array(41).fill(0) }, null, 'x')), '');
 });
-
-test('stats page engagement definitions start with PREREG’s own words', () => {
-  const prereg = readFileSync(new URL('../../prereg/PREREG.md', import.meta.url), 'utf8').replace(/\*\*/g, '');
-  const parts = prereg.match(/^Engagement numbers \(reported, not hypotheses\)\. (.*)$/m)[1].replace(/\.$/, '').split('; ');
-  const defs = ['engagement_rounds_def', 'engagement_return_def', 'engagement_challenge_def', 'engagement_share_def'].map((k) => en.stats[k]);
-  assert.equal(parts.length, 4);
-  parts.forEach((part, i) => assert.ok(defs[i].toLowerCase().startsWith(`${part.toLowerCase()}:`), `${defs[i]} / ${part}`));
-});
-
-test('stats page definitions match PREREG word for word', () => {
-  const prereg = readFileSync(new URL('../../prereg/PREREG.md', import.meta.url), 'utf8').replace(/\*\*/g, '');
-  const mau = prereg.match(/- MAU: (.*)/)[1].replace('; stated wherever MAU is reported', '');
-  assert.equal(en.stats.mau_definition, `MAU: ${mau}`);
-  assert.ok(en.stats.mau_definition.includes('a person who plays on two surfaces counts twice')); // PREREG v1, frozen 2026-10-04
-  assert.equal(en.stats.communities_definition, prereg.match(/- (Communities: .*)/)[1]);
-});
