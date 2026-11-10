@@ -203,7 +203,6 @@ figcaption, .small { font-size: var(--fs-6); }
 }
 .icon-btn { display: inline-grid; place-items: center; width: 44px; min-width: 44px; height: 44px; min-height: 44px; padding: 0; border: 0; border-radius: 999px; background: transparent; color: var(--text); transition: background-color 0.15s; }
 .icon-btn:hover { background: color-mix(in srgb, var(--text) 7%, transparent); }
-@media (max-width: 400px) { .brand { font-size: 19px; } }
 /* Speaker toggle (site.js): pressed = sound on */
 [data-sound-toggle][aria-pressed="true"] .i-snd-off, [data-sound-toggle][aria-pressed="false"] .i-snd-on { display: none; }
 .nav-menu { display: none; }
@@ -239,7 +238,7 @@ figcaption, .small { font-size: var(--fs-6); }
    for .primary; borderless, 44px. Game controls keep the 48px recipe above. */
 :where(a.button, .actions button, .band-go button) { min-height: 44px; padding: 0 20px; border: 0; border-radius: 999px; background: color-mix(in srgb, var(--text) 7%, transparent); font-size: 15px; font-weight: 500; }
 :where(a.button, .actions button, .band-go button):hover { background: color-mix(in srgb, var(--text) 11%, transparent); }
-a.button:not(.primary) { color: var(--text); } /* over the base link colour */
+a.button:where(:not(.primary)) { color: var(--text); } /* over the base link colour */
 .primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 .primary:hover { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 86%, var(--text)); }
 .ghost { background: transparent; border-color: transparent; color: var(--accent); }
@@ -437,7 +436,7 @@ label input, label select { font-weight: 400; }
 .hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
 .result-title { margin: 16px 0 4px; font-size: var(--fs-1); }
 p.grid { margin: 4px 0 0; font-size: 2.6rem; letter-spacing: 0.08em; line-height: 1.2; }
-.headline { margin: 18px 0 4px; font-size: var(--fs-3); line-height: 1.3; }
+.headline { margin: 18px 0 4px; font-size: var(--fs-3); }
 .ranges { margin: 0; padding: 0; list-style: none; }
 .ranges li { margin: 0; padding: 12px 0; border-bottom: 1px solid var(--border); }
 .rq { display: block; color: var(--muted); font-size: var(--fs-6); }
@@ -500,7 +499,7 @@ h3 { margin-top: 20px; }
 /* The type's emblem (brand/emblems): decorative, to the right of the name */
 .type-card { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .type-emblem { flex: none; width: clamp(88px, 14vw, 132px); height: auto; margin: -12px -8px -12px 0; }
-.type-name { color: inherit; font-size: clamp(28px, 5vw, 48px); line-height: 1.05; }
+.type-name { color: inherit; font-size: clamp(28px, 5vw, 48px); }
 .type-card .type-line { margin-top: 10px; font-size: var(--fs-5); font-weight: 600; opacity: 0.92; }
 .roast { margin: 16px 0; padding: 16px 20px; border-radius: var(--r-lg) var(--r-lg) var(--r-lg) 4px; background: var(--ground-alt); font-size: var(--fs-4); font-style: italic; }
 .end-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 20px 0; }
@@ -677,7 +676,7 @@ h3 { margin-top: 20px; }
 .sk-context { margin-top: 10px; color: var(--muted); font-size: 12.5px; }
 .mock-web { padding: 32px; border-color: var(--border); border-radius: var(--r-xl); }
 .mock-web .demo-top { padding-bottom: 24px; border-bottom: 1px solid var(--border); }
-.mock-web .demo-q { margin: 28px 0 24px; font-size: 36px; letter-spacing: -0.035em; }
+.mock-web .demo-q { margin: 28px 0 24px; font-size: 36px; }
 .mock-web .demo-picks { gap: 12px; }
 .mock-web .demo-picks > span { min-height: 124px; align-items: flex-start; flex-direction: column; justify-content: space-between; gap: 16px; padding: 16px; border-radius: var(--radius); font-size: 17px; }
 .mock-web .demo-hint { margin: 24px 0 12px; }
@@ -842,7 +841,7 @@ h3 { margin-top: 20px; }
 .pick.anim.anim-sweep::before { background: linear-gradient(100deg, transparent 20%, color-mix(in srgb, var(--hit) 30%, transparent) 50%, transparent 80%); transform: translateX(110%); animation: sweep 0.75s 0.1s ease-out backwards; }
 .pick.anim.anim-flash::before { background: var(--miss); opacity: 0; animation: flash 0.6s ease-out backwards; }
 .pick.anim.anim-shake { animation: shake 0.42s ease-in-out backwards; }
-.stamp { position: absolute; top: 50%; right: 14px; padding: 2px 12px; border: 3px solid currentColor; border-radius: 8px; background: color-mix(in srgb, var(--surface) 88%, transparent); font-size: 24px; font-weight: 800; line-height: 1.2; text-transform: none; pointer-events: none; transform: translateY(-50%) rotate(-10deg) scale(var(--s, 1)); }
+.stamp { position: absolute; top: 50%; right: 14px; padding: 2px 12px; border: 3px solid currentColor; border-radius: 8px; background: color-mix(in srgb, var(--surface) 88%, transparent); font-size: 24px; font-weight: 700; line-height: 1.2; text-transform: none; pointer-events: none; transform: translateY(-50%) rotate(-10deg) scale(var(--s, 1)); }
 .stamp-bluff { color: var(--miss-ink); }
 .stamp-called { color: var(--gold-ink); text-transform: none; }
 .stamp[data-stake="50"] { --s: 0.8; }
