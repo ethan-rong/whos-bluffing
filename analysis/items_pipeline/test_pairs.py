@@ -139,7 +139,7 @@ class Rules(unittest.TestCase):
         self.assertEqual([P.band(v) for v in (50000, 49999, 20000, 19999, 0)], [2, 1, 1, 0, 0])
         self.assertFalse(P.ranked_ok(ps[0]))  # referenced, but only "known"
         self.assertTrue(P.ranked_ok(dict(ps[0], fame=50000)))
-        self.assertFalse(P.ranked_ok(dict(ps[0], fame=90000, ref_quality="imported")))  # famous, not referenced (PREREG)
+        self.assertFalse(P.ranked_ok(dict(ps[0], fame=90000, ref_quality="imported")))  # famous, not referenced
 
     def test_ranked_ok_false_items_stay_out_of_ranked_days_and_retired_items_out_of_everything(self):
         nile, danube = item(1, "river_length", 6650), item(2, "river_length", 2850, ranked_ok=False, fact_checked=False)

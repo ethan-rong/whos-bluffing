@@ -131,7 +131,7 @@ TEMPLATES = {
 # pol_numbers takes any unit (items/politics_curated.json): every unit gets this template, and units never mix.
 OPEN_UNIT = {"pol_numbers": ("Which is bigger?", "was bigger", "was smaller")}
 # Minimum gap per (category, unit) when it is not MIN_GAP years or MIN_RATIO: AI years are 2 apart (the field is young;
-# a deviation from PREREG's 10, logged in CHANGELOG.md), and the Politics pack's follow the AI pack's. Year difficulty
+# instead of the usual 10, logged in CHANGELOG.md), and the Politics pack's follow the AI pack's. Year difficulty
 # scales with it: easy >= 5x, medium >= 2x.
 MIN_GAPS = {("ai_released", "year"): 2, ("ai_company_founded", "year"): 2, ("ai_params", "parameters"): MIN_RATIO,
             ("ai_timeline", "month"): 3, ("ai_drama", "month"): 2,  # months: answers are YYYYMM numbers (202211 = November 2022)
@@ -381,7 +381,7 @@ def report(pairs, items, carried):
 
 
 def ranked_ok(pair):
-    """May be used in a ranked round or as the chat question: both items referenced or fact-checked (PREREG), famous,
+    """May be used in a ranked round or as the chat question: both items referenced or fact-checked, famous,
     neither marked ranked_ok: false, and not from a quick-only category (QUICK_ONLY: the AI pack)."""
     return (pair["ref_quality"] == "referenced" and pair.get("fame", 0) >= FAME_RANKED and pair.get("ranked_ok", True)
             and pair["category"] not in QUICK_ONLY and pair["category"] != AI_SLOT and not pair.get("volatile"))
