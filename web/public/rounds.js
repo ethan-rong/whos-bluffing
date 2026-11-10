@@ -343,20 +343,22 @@ ${resultGrid(st, t)}
   <p class="type-name">${typeName(res.type)}</p>
   <p class="type-line">${t(typeKey(res.type))}</p>
 </section>
+<div class="end-actions">
+  <button type="button" data-act="challenge">${t('rounds.challenge')}</button>
+  <button type="button" data-act="share" aria-expanded="false" aria-controls="share-panel">${t('rounds.share')}</button>
+</div>
+<div id="challenge-panel" class="card" hidden></div>
+<section id="share-panel" class="card" hidden></section>
 ${!archived && boardOf(st) ? sideBlock(st.pack, t, savedSide(st.pack)) : ''}
 ${res.roast ? html`<p class="roast">${res.roast}</p>` : ''}
 ${counters(t, res)}
 <figure class="mini">${calibrationChart([{ name: t('rounds.you'), bins: calib, cls: 's0' }], chartLabels(t))}<figcaption>${t('rounds.chart_note')}</figcaption></figure>
 <div class="end-actions">
   <button class="primary" type="button" data-act="again">${t('rounds.play_again')}</button>
-  <button type="button" data-act="challenge">${t('rounds.challenge')}</button>
-  <button type="button" data-act="share" aria-expanded="false" aria-controls="share-panel">${t('rounds.share')}</button>
 </div>
 <a class="button block" href="/discord">${t('rounds.discord_friends')}</a>
 <p class="small muted">${t('rounds.discord_friends_note')}</p>
-<div id="challenge-panel" class="card" hidden></div>
-<div id="vs-panel" class="card" hidden></div>
-<section id="share-panel" class="card" hidden></section>`;
+<div id="vs-panel" class="card" hidden></div>`;
   app.scrollIntoView(); // the result sits below the hero, which is back now
   wireGrid(app, st, t);
   // Reviewing a saved result must not claim an old round for the player's current team.
