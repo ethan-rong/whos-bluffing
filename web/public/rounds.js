@@ -172,8 +172,8 @@ async function sendAnswer(ctx, st, k, choice, conf, rtMs) {
   return showReveal(ctx, next, k, before);
 }
 
-// The reveal of answer k: both values with sources (and the AI pack's "Did you know" fact, when the pair has one), the
-// verdict and the points counting to their value, the game's line, and the motion that goes with it (a green sweep and confetti when right, a shake, a red flash and a BLUFF stamp
+// The reveal of answer k: both values with sources, the verdict and the points counting to their value (then the
+// pair's "Did you know" fact, when it has one), the game's line, and the motion that goes with it (a green sweep and confetti when right, a shake, a red flash and a BLUFF stamp
 // when wrong, a gold "Called it" at 100% right). Sounds: a ding or a womp.
 function showReveal(ctx, st, k, before) {
   const { app, t } = ctx;
@@ -199,12 +199,12 @@ function showReveal(ctx, st, k, before) {
   <span class="letter" aria-hidden="true">${c === truthIndex ? '✓' : 'AB'[c]}</span>
   <span class="name">${name}<span class="value">${fmtValue(values[c], a.truth.unit)}</span><a class="src" href="${sources[c]}" target="_blank" rel="noopener noreferrer">${t('rounds.source')}</a></span>${stamp(c)}
 </div>`)}</div>
-${a.truth.fun ? html`<p class="fun"><span class="fun-label">${t('rounds.fun_label')}</span> ${a.truth.fun}</p>` : ''}
 <section class="reveal anim ${a.correct ? 'is-hit anim-hit' : 'is-miss anim-miss'}" aria-live="polite">
   <p class="verdict">${a.correct ? `✓ ${t('rounds.right')}` : `✗ ${t('rounds.wrong')}`} <span class="muted">${t('rounds.at_conf', { conf: a.conf })}</span></p>
   <p class="pts anim ${a.correct ? 'anim-pop' : 'anim-shake'} ${a.points > 0 ? 'up' : a.points < 0 ? 'down' : ''}" data-points>${fmtPoints(a.points)}</p>
   ${a.line ? html`<p class="reaction">${a.line}</p>` : ''}
 </section>
+${a.truth.fun ? html`<p class="fun"><span class="fun-label">${t('rounds.fun_label')}</span> ${a.truth.fun}</p>` : ''}
 <button id="next" class="primary block" type="button">${last ? t('rounds.see_score') : t('rounds.next')}</button>
 <div id="flag"></div>`;
   if (a.correct) sound.ding(a.conf); else sound.womp(a.conf);
@@ -341,6 +341,7 @@ ${saveFailed ? html`<p role="status">${t('rounds.recent_save_failed')}</p>` : ''
 ${resultGrid(st, t)}
 <section class="type-card type-${TYPES[res.type]} anim anim-flip" aria-label="${t('rounds.type_label')}">
   <p class="type-name">${typeName(res.type)}</p>
+  <p class="type-line">${t(typeKey(res.type))}</p>
 </section>
 ${!archived && boardOf(st) ? sideBlock(st.pack, t, savedSide(st.pack)) : ''}
 ${res.roast ? html`<p class="roast">${res.roast}</p>` : ''}

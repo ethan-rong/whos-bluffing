@@ -489,6 +489,7 @@ h3 { margin-top: 20px; }
 .type-card.type-hedger { --tc: var(--muted); --tc-ink: var(--surface); }
 .type-card p { margin: 0; }
 .type-name { color: inherit; font-family: var(--font-display); font-size: clamp(40px, 6vw, 64px); font-weight: 600; letter-spacing: -0.045em; line-height: 1; }
+.type-card .type-line { margin-top: 10px; font-size: var(--fs-5); font-weight: 600; opacity: 0.92; }
 .roast { margin: 16px 0; padding: 16px 20px; border-radius: var(--r-lg) var(--r-lg) var(--r-lg) 4px; background: var(--ground-alt); font-size: var(--fs-4); font-style: italic; }
 .end-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 20px 0; }
 .end-actions .primary { grid-column: 1 / -1; }
@@ -980,8 +981,17 @@ img.dc-avatar { display: block; object-fit: cover; }
 
 @media (max-width: 519px) {
   #app, #round-setup { padding-top: 24px; padding-bottom: 48px; }
-  .q { margin-top: 24px; font-size: 30px; }
-  .pick { min-height: 104px; padding: 16px; }
+  .q { margin-top: 20px; font-size: 28px; }
+  /* Answers as compact rows, so the verdict and Next fit one phone screen; Next and Start stay pinned in reach */
+  .pick, .revealed .pick { flex-direction: row; align-items: center; justify-content: flex-start; gap: 14px; min-height: 72px; padding: 14px 16px; }
+  .pick .name { flex: 1; }
+  .pick .value { display: inline; margin: 0 10px 0 0; font-size: var(--fs-4); }
+  .pick .value::before { content: "\A"; white-space: pre; }
+  .pick .src { margin-top: 0; }
+  .picks { margin-bottom: 16px; }
+  .reveal { margin: 0 0 12px; padding: 12px 16px; }
+  #next, .start-row { position: sticky; bottom: 12px; z-index: 5; }
+  #next, .start-row .primary { box-shadow: 0 0 0 10px var(--bg); }
   .conf { gap: 4px; }
   .type-card { padding: 24px; }
 }
