@@ -235,10 +235,10 @@ figcaption, .small { font-size: var(--fs-6); }
 }
 :where(button, .button):where(:active:not(:disabled)) { transform: translateY(1px) scale(0.985); transition-duration: 0.09s; }
 /* Marketing actions (links as buttons, hero and page actions, the close panel) are pills: soft grey, or the accent
-   for .primary; borderless, 44px. Game controls keep the 48px recipe above. */
-:where(a.button, .actions button, .band-go button) { min-height: 44px; padding: 0 20px; border: 0; border-radius: 999px; background: color-mix(in srgb, var(--text) 7%, transparent); font-size: 15px; font-weight: 500; }
-:where(a.button, .actions button, .band-go button):hover { background: color-mix(in srgb, var(--text) 11%, transparent); }
-a.button:where(:not(.primary)) { color: var(--text); } /* over the base link colour */
+   for .primary; borderless, 44px. Game controls, and links inside the game, keep the 48px recipe above. */
+:where(a.button, .actions button, .band-go button):where(:not(#app *)) { min-height: 44px; padding: 0 20px; border: 0; border-radius: 999px; background: color-mix(in srgb, var(--text) 7%, transparent); font-size: 15px; font-weight: 500; }
+:where(a.button, .actions button, .band-go button):where(:not(#app *)):hover { background: color-mix(in srgb, var(--text) 11%, transparent); }
+a.button:where(:not(.primary)):where(:not(#app *)) { color: var(--text); } /* over the base link colour */
 .primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 .primary:hover { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 86%, var(--text)); }
 .ghost { background: transparent; border-color: transparent; color: var(--accent); }
@@ -422,7 +422,7 @@ label input, label select { font-weight: 400; }
 .progress { display: flex; align-items: center; gap: 10px; margin-top: 8px; color: var(--muted); font-size: var(--fs-6); font-variant-numeric: tabular-nums; }
 .progress progress { flex: 1 1 auto; min-width: 0; height: 6px; accent-color: var(--accent); }
 .progress span { flex: 0 0 auto; }
-.q { margin: 32px 0 24px; font-size: clamp(30px, 4vw, 40px); }
+#app .q { margin: 32px 0 24px; font-size: clamp(24px, 3vw, 30px); } /* #app outranks the h2 rule above */
 .sub { margin-top: 16px; font-weight: 600; }
 .options { display: grid; gap: 10px; }
 .opt { justify-content: flex-start; min-height: 56px; padding: 10px 16px; border-color: var(--border); border-radius: var(--radius); font-size: var(--fs-4); font-weight: 500; text-align: left; }
@@ -976,7 +976,7 @@ img.dc-avatar { display: block; object-fit: cover; }
 
 @media (max-width: 519px) {
   #app, #round-setup { padding-top: 24px; padding-bottom: 48px; }
-  .q { margin-top: 20px; font-size: 28px; }
+  #app .q { margin-top: 20px; font-size: 22px; }
   /* Answers as compact rows, so the verdict and Next fit one phone screen; Next and Start stay pinned in reach */
   .pick, .revealed .pick { flex-direction: row; align-items: center; justify-content: flex-start; gap: 14px; min-height: 72px; padding: 14px 16px; }
   .pick .name { flex: 1; }
