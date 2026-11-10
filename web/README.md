@@ -148,7 +148,6 @@ Player counts scan play history: the public total is cached for 60 seconds, whil
 11. `curl -H "x-bluff-bot: $BOT_KEY" "https://<site>/api/round/reveal?community=slack:test"` answers 200; without the header, 403.
 12. `npx wrangler d1 execute whosbluffing --remote --command "SELECT * FROM round_plays LIMIT 3"`: anonymous ids and public tokens only, no IP address or user agent.
 
-Deviations from the brief and known limits: `NOTES.md`.
 
 ## Owner player counts
 

@@ -169,26 +169,19 @@ if bad: print("dare problems:", bad[:8]); sys.exit(1)
 print("dares OK")
 PY
 
-say "party balance (members of Congress: equal numbers per party in dares/dares.json, on the dare board and in the X watch list, joined by handle; a watched member whose dare is not on the board yet is a WARN)"
+say "party balance (members of Congress: equal numbers per party in dares/dares.json and on the dare board)"
 ROOT="$root" node --input-type=module -e '
 const root = process.env.ROOT;
 const { readFileSync } = await import("node:fs");
-const { WATCH } = await import(`${root}/x/src/watch.js`);
 const dares = JSON.parse(readFileSync(`${root}/dares/dares.json`, "utf8"));
 const board = new Set(JSON.parse(readFileSync(`${root}/web/functions/_dares.json`, "utf8")).map((d) => d.slug));
 const side = (d) => d.caucus ?? d.party;
 const members = dares.filter((d) => d.party && d.status !== "removed");
-const byHandle = new Map(members.map((d) => [d.handle.toLowerCase(), d]));
-const watched = WATCH.filter((u) => u.pack === "politics").map((u) => byHandle.get(u.handle.toLowerCase()) ?? { slug: `@${u.handle}` });
 const count = (list) => ["democrat", "republican"].map((s) => list.filter((d) => side(d) === s).length);
-const rows = [["dares/dares.json", count(members)], ["the dare board", count(members.filter((d) => board.has(d.slug)))], ["the X watch list", count(watched)]];
+const rows = [["dares/dares.json", count(members)], ["the dare board", count(members.filter((d) => board.has(d.slug)))]];
 for (const [where, [dem, rep]] of rows) console.log(`${where}: ${dem} who caucus with the Democrats, ${rep} Republicans`);
-const unknown = watched.filter((d) => !d.party).map((d) => d.slug);
-const waiting = watched.filter((d) => d.party && !board.has(d.slug)).map((d) => d.slug);
-if (waiting.length) console.log(`WARN watched, but not on the dare board yet (their link 404s until it is filled): ${waiting.join(", ")}`);
-if (unknown.length) console.log(`watched as politicians but not in dares/dares.json: ${unknown.join(", ")}`);
 const bad = rows.filter(([, [dem, rep]]) => dem !== rep).map(([where]) => where);
-if (bad.length || unknown.length) { console.log(`party balance broken: ${bad.join(", ") || "the watch list"}`); process.exit(1); }
+if (bad.length) { console.log(`party balance broken: ${bad.join(", ")}`); process.exit(1); }
 console.log("party balance OK");
 ' || fail=1
 

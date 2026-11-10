@@ -26,3 +26,9 @@ USER_TODO.md
 x/
 briefs/
 web/NOTES.md
+discord/NOTES.md
+slack/NOTES.md
+docs/PARITY.md
+docs/design-v*.md
+daily/LAUNCH_REVIEW.md
+scripts/snapshot-tod.sh
