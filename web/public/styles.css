@@ -6,8 +6,8 @@
    Tokens: light by default; dark from prefers-color-scheme unless the visitor chose light, or from the stored toggle
    (site.js sets data-theme). The two dark blocks must stay identical; web/design/contrast.js checks every
    text/background pair below. --hit/--miss are fills (squares, bars, borders); text uses --hit-ink/--miss-ink.
-   Grounds: one paper ground (--bg) for every section, --surface (cards), --ground-alt (quotes, the roast), the accent
-   panel (Get started) and --ink-ground (the home hero's panel). Flat: hairlines, no resting shadows. The interface
+   Grounds: one paper ground (--bg) for every section, --surface (cards), --ground-alt (quotes, the roast, the home
+   hero's panel) and the accent panel (Get started). Flat: hairlines, no resting shadows. The interface
    stays neutral; the accent marks the main action, links, focus and state. Widths: --w-wide for media, --w-text to read. */
 @font-face {
   font-family: "Newsreader";
@@ -42,11 +42,6 @@
   --miss-ink: #B42318;
   --gold-ink: #8A5A00;
   --focus: #FFB020;
-  --ink-ground: #111827;
-  --ink-text: #F4F2EC;
-  --ink-muted: #A9B1BE;
-  --ink-line: #2A3242;
-  --ink-accent: #9DB0FF;
   --shadow: 0 1px 2px rgb(17 24 39 / 0.05), 0 8px 24px -12px rgb(17 24 39 / 0.12);
   --lift: 0 1px 2px rgb(17 24 39 / 0.06), 0 24px 44px -24px rgb(17 24 39 / 0.28);
   --chat-shadow: 0 18px 44px -12px rgb(17 24 39 / 0.22);
@@ -89,11 +84,6 @@
     --hit-ink: #3DBE6A;
     --miss-ink: #FF7A7E;
     --gold-ink: #F2C14E;
-    --ink-ground: #07090D;
-    --ink-text: #E6EDF3;
-    --ink-muted: #9AA4B2;
-    --ink-line: #1E242D;
-    --ink-accent: #9DB0FF;
     --shadow: 0 1px 2px rgb(0 0 0 / 0.35);
     --lift: 0 1px 2px rgb(0 0 0 / 0.4), 0 24px 44px -24px rgb(0 0 0 / 0.8);
     --chat-shadow: 0 18px 44px -12px rgb(0 0 0 / 0.7);
@@ -114,11 +104,6 @@
   --hit-ink: #3DBE6A;
   --miss-ink: #FF7A7E;
   --gold-ink: #F2C14E;
-  --ink-ground: #07090D;
-  --ink-text: #E6EDF3;
-  --ink-muted: #9AA4B2;
-  --ink-line: #1E242D;
-  --ink-accent: #9DB0FF;
   --shadow: 0 1px 2px rgb(0 0 0 / 0.35);
   --lift: 0 1px 2px rgb(0 0 0 / 0.4), 0 24px 44px -24px rgb(0 0 0 / 0.8);
   --chat-shadow: 0 18px 44px -12px rgb(0 0 0 / 0.7);
@@ -610,9 +595,9 @@ h3 { margin-top: 20px; }
 .text-link:hover span { text-decoration: underline; }
 .text-link .i { width: 18px; height: 18px; }
 .text-link:hover .i { transform: translateX(3px); }
-/* The panel: the ink ground; the switcher reads the ink tokens, the mocks keep the page's */
-.home-demo { min-width: 0; padding: 20px; border-radius: 6px; background: var(--ink-ground); }
-.surfaces { --surface: transparent; --border: var(--ink-line); --text: var(--ink-text); --bg: var(--ink-ground); --accent: var(--ink-accent); display: flex; width: max-content; max-width: 100%; margin: 0 auto 28px; color: var(--text); }
+/* The panel: the warmer paper in light, a shade off the page in dark */
+.home-demo { min-width: 0; padding: 20px; border-radius: 6px; background: var(--ground-alt); }
+.surfaces { display: flex; width: max-content; max-width: 100%; margin: 0 auto 28px; }
 .surfaces button { min-height: 40px; padding: 6px 20px; font-size: var(--fs-6); }
 .mocks { display: grid; isolation: isolate; max-width: 560px; margin: 0 auto; }
 .mocks > .mock { grid-area: 1 / 1; align-self: center; }

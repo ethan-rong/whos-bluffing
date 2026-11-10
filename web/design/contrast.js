@@ -42,15 +42,13 @@ const TEXT = [
   ['surface', 'hit-ink', 'the right answer\'s letter; the Spot on type card'],
   ['surface', 'miss-ink', 'the wrong pick\'s letter; the Bluffer type card'],
   ['surface', 'gold-ink', 'the Hot-headed type card'], ['surface', 'muted', 'the Hedger type card'],
-  ['ink-text', 'ink-ground', 'the home hero panel\'s switcher'], ['ink-ground', 'ink-text', 'the switcher\'s pressed button'],
 ];
 // Display text of 24px bold or larger may use 3:1. None of the tokens needs this today.
 const LARGE = [];
-// Non-text (WCAG 1.4.11, 3:1): the focus ring is a 2px --accent outline (--ink-accent on the home hero's panel,
-// --accent-ink on the accent panel); inputs are outlined in --muted.
+// Non-text (WCAG 1.4.11, 3:1): the focus ring is a 2px --accent outline (--accent-ink on the accent panel); inputs are outlined in --muted.
 const NON_TEXT = [
   ['accent', 'bg', 'focus ring'], ['accent', 'surface', 'focus ring on cards'], ['accent', 'ground-alt', 'focus ring in quotes'],
-  ['ink-accent', 'ink-ground', 'focus ring on the home hero panel'], ['accent-ink', 'accent', 'focus ring on the Get started panel'],
+  ['accent-ink', 'accent', 'focus ring on the Get started panel'],
   ['muted', 'surface', 'input borders'], ['muted', 'bg', 'input borders on the page'],
 ];
 
