@@ -156,7 +156,7 @@ figcaption, .small { font-size: var(--fs-6); }
 .skip:focus { top: 12px; }
 .wrap { width: 100%; max-width: calc(var(--w-wide) + 2 * var(--gut)); margin: 0 auto; padding: 0 var(--gut); }
 /* Figtree for every number (scores, counters, codes, the stamp) */
-.counters b, .tile b, .result-title, .round-total b, .pick .value, .pts, .code, .player-count, .sq-pts, .steps li::before { font-family: var(--font); font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: normal; }
+.counters b, .result-title, .round-total b, .pick .value, .pts, .code, .player-count, .sq-pts, .steps li::before { font-family: var(--font); font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: normal; }
 
 /* Icons: inline SVG, stroked in the current text colour */
 .i { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.15s var(--ease); }
@@ -253,12 +253,10 @@ label input, label select { font-weight: 400; }
 .card h2 { font-size: var(--fs-3); }
 .card > :first-child { margin-top: 0; }
 .card > :last-child { margin-bottom: 0; }
-.counters, .tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 16px 0; }
-.tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-@media (min-width: 520px) { .tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-.counters > div, .tile { padding: 16px 12px; text-align: center; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
-.counters b, .tile b { display: block; font-size: var(--fs-3); line-height: 1.15; }
-.counters span, .tile span { display: block; margin-top: 4px; color: var(--muted); font-size: var(--fs-6); line-height: 1.3; }
+.counters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 16px 0; }
+.counters > div { padding: 16px 12px; text-align: center; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+.counters b { display: block; font-size: var(--fs-3); line-height: 1.15; }
+.counters span { display: block; margin-top: 4px; color: var(--muted); font-size: var(--fs-6); line-height: 1.3; }
 .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: 13px; font-weight: 600; }
 
 /* Messages */
@@ -495,8 +493,6 @@ h3 { margin-top: 20px; }
 .vs thead th { color: var(--muted); font-size: var(--fs-6); font-weight: 500; }
 .nick label { margin-top: 0; }
 .mini .chart, .mini .legend, .mini figcaption { max-width: 360px; }
-.tiles-5 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-@media (min-width: 640px) { .tiles-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
 .defs { padding-left: 1.1em; }
 
 /* Charts (inline SVG) */
@@ -793,7 +789,6 @@ h3 { margin-top: 20px; }
 .status-dot[data-state="up"] { background: var(--hit); }
 .status-dot[data-state="slow"], .status-dot[data-state="wait"] { background: var(--focus); }
 .status-dot[data-state="down"] { background: var(--miss); }
-.status .tiles b { font-variant-numeric: tabular-nums; }
 .status-sub { margin-top: 40px; font-size: var(--fs-3); }
 .boilerplate { max-width: 46em; padding: 20px 24px; background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 var(--r-lg) var(--r-lg) 0; }
 .press-grid { display: grid; gap: 16px; margin: 0; padding: 0; list-style: none; }
