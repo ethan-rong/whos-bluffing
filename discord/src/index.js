@@ -126,12 +126,21 @@ async function tick(env, now) {
 export default {
   async fetch(request, env, ctx) {
     try {
+      const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+      if (!(await env.REQUEST_LIMITER.limit({ key: ip })).success) {
+        return new Response('Too many requests', { status: 429, headers: { 'retry-after': '60', 'cache-control': 'no-store' } });
+      }
       const { pathname } = new URL(request.url);
       const route = `${request.method} ${pathname}`;
       if (route === 'POST /interactions') return await interactions(request, env, ctx);
       if (route === 'POST /events') return await events(request, env, ctx);
       if (route === 'GET /install') return Response.redirect(new URL(request.url).searchParams.get('type') === 'user' ? personalInstallUrl(env) : installUrl(env), 302);
-      if (route === 'GET /presence') return (await presence(env)) ?? textResponse('No presence binding', 503);
+      if (route === 'GET /presence') {
+        if (!(await env.PRESENCE_LIMITER.limit({ key: 'presence' })).success) {
+          return new Response('Too many requests', { status: 429, headers: { 'retry-after': '60', 'cache-control': 'no-store' } });
+        }
+        return (await presence(env)) ?? textResponse('No presence binding', 503);
+      }
       return textResponse('Not found', 404);
     } catch (err) {
       logError('request', err);

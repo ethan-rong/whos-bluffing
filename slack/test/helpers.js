@@ -34,6 +34,7 @@ export function fakeD1() {
 
 export const makeEnv = (db = fakeD1()) => ({
   DB: db,
+  REQUEST_LIMITER: { limit: async () => ({ success: true }) },
   API_BASE: 'https://api.test',
   SLACK_SIGNING_SECRET: SECRET,
   SLACK_CLIENT_ID: 'client-id',

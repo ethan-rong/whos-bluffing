@@ -54,6 +54,8 @@ export function fakeD1({ readDelay = 0 } = {}) {
 
 export const makeEnv = (db = fakeD1()) => ({
   DB: db,
+  REQUEST_LIMITER: { limit: async () => ({ success: true }) },
+  PRESENCE_LIMITER: { limit: async () => ({ success: true }) },
   API_BASE: 'https://api.test',
   DISCORD_APP_ID: APP_ID,
   DISCORD_PUBLIC_KEY: PUBLIC_KEY,

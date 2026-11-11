@@ -419,6 +419,10 @@ async function events(request, env, ctx) {
 export default {
   async fetch(request, env, ctx) {
     try {
+      const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+      if (!(await env.REQUEST_LIMITER.limit({ key: ip })).success) {
+        return new Response('Too many requests', { status: 429, headers: { 'retry-after': '60', 'cache-control': 'no-store' } });
+      }
       const { pathname } = new URL(request.url);
       const route = `${request.method} ${pathname}`;
       if (route === 'GET /slack/oauth/start') return oauthStart(request, env);

@@ -1,6 +1,15 @@
 name = "whosbluffing-slack"
 main = "src/index.js"
 compatibility_date = "2026-09-01"
+preview_urls = false
+
+[limits]
+cpu_ms = 1000
+
+[[ratelimits]]
+name = "REQUEST_LIMITER"
+namespace_id = "3002"
+simple = { limit = 600, period = 60 }
 
 # Hourly: each run reveals due questions, posts Monday recaps, and posts to the workspaces whose UTC post hour has come.
 # The brief said "0 14 * * *"; that cannot honour `/bluff setup #channel [HH]`. See NOTES.md.

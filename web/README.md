@@ -80,7 +80,7 @@ npx wrangler pages secret put BOT_KEY --project-name whosbluffing   # another lo
 
 1. Pages project → **Custom domains** → add `bots.whosbluffing.com` next to `whosbluffing.com`.
 2. Set the bots' `API_BASE` to `https://bots.whosbluffing.com` (in `slack/wrangler.toml` and `discord/wrangler.toml`) and redeploy them. On that host `functions/_middleware.js` serves only `/api/*` and only with `x-bluff-bot` = `BOT_KEY`.
-3. WAF → **Rate limiting rules**: 120 requests per minute per IP, block for a minute (answers 429), with the expression `(http.host eq "whosbluffing.com" or http.host eq "www.whosbluffing.com") and (http.request.uri.path contains "/api/")`, so the bots' host is never limited.
+3. WAF → **Rate limiting rules**: 150 requests per 10 seconds per IP, block for 10 seconds, with the expression `(http.host eq "whosbluffing.com" or http.host eq "www.whosbluffing.com") and (http.request.uri.path contains "/api/")`, so the bots' host is never limited.
 
 Pages Functions have no rate limiter of their own.
 
@@ -158,3 +158,5 @@ Total Players is all-time unique anonymous IDs with a completed round or assessm
 ## Recent games
 
 `public/recent-games.js` keeps the last 10 distinct completed-round snapshots in browser storage. Saving happens only after the server confirms completion. `/play` shows a collapsed list with topic, difficulty, date, result, friend-result link and Play again. `/results?round=<id>` restores a snapshot without completing it again, changing a lab/party claim, or touching the unfinished round. The existing rematch API supplies ten fresh questions at the original topic and difficulty. Browser storage failures do not block results; the current tab retains its result. No account, backend migration or historic backfill is added.
+
+CPU protection: `wrangler.toml` and the Cloudflare Pages production/preview project settings specify 1,000 ms CPU per invocation. On November 10, 2026, the project settings were read back and existing bindings/environment were preserved. The current frontend deployment was not replaced; runtime enforcement on that already-existing deployment was not independently tested. The KPI Worker also retains its existing 1,000 ms CPU ceiling in its source configuration.

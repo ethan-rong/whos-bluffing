@@ -296,3 +296,11 @@ The bot token can post as Who's Bluffing in every server that added it. To rotat
   revealing in the same hour, may need Workers Paid ($5/month).
 - **When the web API at `API_BASE` is down,** members see "Who's Bluffing is taking a break, try again in a minute." Posts
   and reveals retry the next hour.
+
+## Cloudflare cost protection
+
+The deployed Worker has a 1,000 ms CPU ceiling per invocation. Public HTTP requests use Cloudflare’s native rate limiter at 600 requests per minute per Cloudflare client IP, before body parsing, signature verification, database work or provider calls. Limit responses are HTTP 429 with `Retry-After: 60`; hourly jobs retain their schedule. Version preview URLs are disabled; the production workers.dev URL remains enabled.
+
+The public `/presence` endpoint additionally permits 10 checks per minute per Cloudflare location across callers. Cron and the existing alarm retain the single `main` presence object, keeping the bot online. Its outgoing Discord gateway connection does not support hibernation.
+
+Cloudflare rate counters are approximate and local to a Cloudflare location. These settings reduce abuse; they do not impose an account-wide dollar cap. Billing alerts also lag and exclude the fixed subscription fee.

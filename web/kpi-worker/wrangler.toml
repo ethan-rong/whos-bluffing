@@ -5,6 +5,10 @@ name = "whosbluffing-kpi"
 main = "src/index.js"
 compatibility_date = "2026-09-01"
 workers_dev = false
+preview_urls = false
+
+[limits]
+cpu_ms = 1000
 
 [vars]
 RUN_URL = "https://whosbluffing.com/api/kpi/run" # replace with the deployed site's address

@@ -185,3 +185,9 @@ No member messages or emails are collected. Daily display names are fetched only
 - Workspace installs only; Enterprise Grid org-wide installs are not supported.
 - Not in the Slack App Directory yet; installs go through the Add to Slack link.
 - When the web API at `API_BASE` is down, members see "Who's Bluffing is taking a break, try again in a minute." and the hourly post retries the next hour.
+
+## Cloudflare cost protection
+
+The deployed Worker has a 1,000 ms CPU ceiling per invocation. Public HTTP requests use Cloudflare’s native rate limiter at 600 requests per minute per Cloudflare client IP, before body parsing, signature verification, database work or provider calls. Limit responses are HTTP 429 with `Retry-After: 60`; hourly jobs retain their schedule. Version preview URLs are disabled; the production workers.dev URL remains enabled.
+
+Cloudflare rate counters are approximate and local to a Cloudflare location. These settings reduce abuse; they do not impose an account-wide dollar cap. Billing alerts also lag and exclude the fixed subscription fee.
