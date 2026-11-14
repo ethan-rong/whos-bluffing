@@ -1,5 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { WELCOME, channelHello } from '../src/game.js';
 import {
   APP_ID, CHANNEL, GUILD, USER, addPost, channelOfPost, channelPosts, install, makeCtx, makeEnv, mockFetch, runCron, send, signedRequest,
@@ -9,7 +10,8 @@ import {
 const G2 = '770000000000000032';
 const C2 = '660000000000000032';
 const SYSTEM = '660000000000000031';
-const [T1, T2, T3, T4] = ['660000000000000041', '660000000000000042', '660000000000000043', '660000000000000044'];
+const [T1, T2, T3, T4, T5, T6] = Array.from({ length: 6 }, (_, k) => `66000000000000004${k + 1}`);
+const [VIEW, SEND] = [1 << 10, 1 << 11]; // VIEW_CHANNEL, SEND_MESSAGES
 const TS = '2026-10-06T14:42:53.064834'; // the event timestamp, in the format of Discord's examples
 
 const toEvents = (payload, opts) => signedRequest(payload, { ...opts, path: '/events' });
@@ -29,7 +31,11 @@ const server = ({ system = SYSTEM, channels = [], refuse = [] } = {}) => (c) => 
   if (c.method === 'POST' && refuse.includes(channelOfPost(c))) return { status: 403, body: { code: 50013 } };
   return undefined;
 };
-const text = (id, position) => ({ id, type: 0, position });
+// `deny` maps a role id to the permission bits its overwrite denies on this channel.
+const text = (id, position, deny) => ({
+  id, type: 0, position,
+  ...(deny && { permission_overwrites: Object.entries(deny).map(([role, bits]) => ({ id: role, type: 0, allow: '0', deny: String(bits) })) }),
+});
 const posted = (calls) => channelPosts(calls).map(channelOfPost);
 
 test('events: a forged or stale signature gets 401 and changes nothing', async () => {
@@ -92,10 +98,27 @@ test('server install: the system channel refuses, so text channels follow in pos
   assert.deepEqual(posted(calls), [SYSTEM, T1]);
 });
 
-test('server install: no writable channel gives up quietly after 3 posts and keeps the server', async () => {
+test('server install: channels closed to @everyone are skipped without a call; another role\'s deny is not', async () => {
   const env = makeEnv();
-  const channels = [text(T4, 4), text(T3, 3), text(T2, 2), text(T1, 1)];
-  const calls = mockFetch({ discord: server({ system: null, channels, refuse: [T1, T2, T3, T4] }) });
+  const ROLE = '550000000000000001';
+  const channels = [
+    text(T1, 1, { [GUILD]: VIEW }), // rules: hidden from @everyone
+    text(T2, 2, { [GUILD]: SEND | (1 << 6) }), // announcements: read-only for @everyone
+    text(T5, 3, { [GUILD]: VIEW | SEND }),
+    text(T6, 4, { [ROLE]: VIEW, [GUILD]: SEND }),
+    text(T3, 5, { [ROLE]: SEND }), // muted role only: still open to @everyone, and reached because skips cost no try
+    text(T4, 6),
+  ];
+  const calls = mockFetch({ discord: server({ channels, refuse: [SYSTEM] }) });
+  await send(env, toEvents(authorized()));
+  assert.deepEqual(posted(calls), [SYSTEM, T3]);
+  assert.equal(env.DB.rows('SELECT channel_id FROM installs')[0].channel_id, T3);
+});
+
+test('server install: no writable channel gives up quietly after 5 posts and keeps the server', async () => {
+  const env = makeEnv();
+  const channels = [text(T6, 6), text(T5, 5), text(T4, 4), text(T3, 3), text(T2, 2), text(T1, 1)];
+  const calls = mockFetch({ discord: server({ system: null, channels, refuse: [T1, T2, T3, T4, T5, T6] }) });
   const logged = [];
   const consoleError = console.error;
   console.error = (line) => logged.push(line);
@@ -105,11 +128,11 @@ test('server install: no writable channel gives up quietly after 3 posts and kee
   } finally {
     console.error = consoleError;
   }
-  assert.deepEqual(posted(calls), [T1, T2, T3]);
+  assert.deepEqual(posted(calls), [T1, T2, T3, T4, T5]);
   assert.deepEqual(logged, []);
   assert.deepEqual(env.DB.rows('SELECT guild_id, channel_id FROM installs'), [{ guild_id: GUILD, channel_id: null }]);
   await runCron(env, '2026-10-06T10:00:00Z'); // the install's one pick is spent: the hourly run tries nothing more
-  assert.deepEqual(posted(calls), [T1, T2, T3]);
+  assert.deepEqual(posted(calls), [T1, T2, T3, T4, T5]);
 });
 
 test('user install (integration_type 1) is acknowledged and ignored', async () => {
@@ -228,14 +251,36 @@ test('the hourly pick leaves servers that have a channel or ever posted, and tri
   assert.equal(env2.DB.rows('SELECT channel_id FROM installs')[0].channel_id, null);
 });
 
-test('the hourly pick handles five servers a run', async () => {
+test('the hourly pick handles three servers a run', async () => {
   const env = makeEnv();
   const guilds = Array.from({ length: 7 }, (_, k) => `7700000000000001${String(k).padStart(2, '0')}`);
   for (const g of guilds) await install(env, g);
   const calls = mockFetch({ discord: (c) => (c.method === 'GET' ? { body: { system_channel_id: SYSTEM } } : undefined) });
   await runCron(env, '2026-10-06T10:00:00Z');
-  assert.equal(posted(calls).length, 5);
+  assert.equal(posted(calls).length, 3);
   await runCron(env, '2026-10-06T11:00:00Z');
+  assert.equal(posted(calls).length, 6);
+  await runCron(env, '2026-10-06T12:00:00Z');
   assert.equal(posted(calls).length, 7);
   assert.equal(env.DB.rows('SELECT COUNT(*) AS n FROM installs WHERE channel_id = ?', SYSTEM)[0].n, 7);
+});
+
+test('migration 0006 gives a server whose one pick found no channel one more hourly pick; a server that posted stays', async () => {
+  const env = makeEnv();
+  const SPENT = '2026-10-01T00:00:00.000Z';
+  await install(env, GUILD);
+  await install(env, G2);
+  await addPost(env, { guild: G2 });
+  await env.DB.prepare('UPDATE installs SET auto_channel = ?').bind(SPENT).run(); // both picks spent, no channel found
+  const calls = mockFetch({ discord: server({ channels: [text(T1, 0)] }) });
+  await runCron(env, '2026-10-06T10:00:00Z');
+  assert.deepEqual(posted(calls), []);
+
+  await env.DB.prepare(readFileSync(new URL('../migrations/0006_retry_pick.sql', import.meta.url), 'utf8')).run();
+  await runCron(env, '2026-10-06T11:00:00Z');
+  assert.deepEqual(posted(calls), [SYSTEM]);
+  assert.deepEqual(env.DB.rows('SELECT guild_id, channel_id, auto_channel FROM installs ORDER BY guild_id'), [
+    { guild_id: GUILD, channel_id: SYSTEM, auto_channel: '2026-10-06T11:00:00.000Z' },
+    { guild_id: G2, channel_id: null, auto_channel: SPENT },
+  ]);
 });

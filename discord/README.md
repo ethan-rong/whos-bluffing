@@ -44,11 +44,11 @@ the owner, chat and message; saved answers, results and rematches can resume aft
 - **Mondays:** a recap of last week. It shows how often the server was right at each confidence level, the most
   calibrated member (named), the bluff count (80%+ sure and wrong), and the streak of days with an answer.
 - **When a server adds it:** one welcome message, in the server's system channel or else the text channel nearest the
-  top of the list that Who's Bluffing may post in. **Play solo** and **Play with friends** open the corresponding
+  top of the list that Who's Bluffing may post in (channels closed to @everyone skipped, 5 posts at most). **Play solo** and **Play with friends** open the corresponding
   private picker; a party becomes public only after **Start party**. Challenge at the end of a solo round shares the
   result only when pressed. The channel that takes the welcome becomes the daily channel (default 14:00 UTC), with
   no setup; an admin moves it or changes the hour with `/bluff setup`, whose hello has the same two play buttons.
-  Servers added before this got the same pick once from the hourly run, five a run, with the setup hello. A server
+  Servers added before this got the same pick once from the hourly run, three a run, with the setup hello. A server
   where no channel takes the welcome gets no daily question until `/bluff setup`. The install welcome needs the
   Webhook Events URL (step 7).
 
@@ -251,7 +251,8 @@ The `reveal` option needs no migration: the column was there from the start, and
 selected settings, and retry-safe solo state; apply both before this worker version. The picker uses components under
 the existing `/bluff play` and `/bluff party` commands, so this update needs no command re-registration.
 `0005_auto_channel.sql` records each server's one automatic daily-channel pick; apply it before the version that
-starts the daily question without setup.
+starts the daily question without setup. `0006_retry_pick.sql` gives servers whose pick found no channel one more
+pick from the hourly run; apply it with the version that skips channels closed to @everyone.
 Unit/integration tests use local data only and do not inflate live metrics.
 
 ## Data

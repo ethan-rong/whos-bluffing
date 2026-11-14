@@ -19,7 +19,7 @@ const MONDAY = 1;
 const CHANNEL_GONE = new Set([403, 404]);
 const WEBHOOK_EVENT = 1; // webhook events: 0 = PING, 1 = an event
 const USER_INSTALL = 1; // integration_type: 0 = server, 1 = a member's own account
-const PICKS_PER_TICK = 5; // keeps each hourly run to about 25 Discord calls for the picks
+const PICKS_PER_TICK = 3; // 3 servers × (2 reads + up to 5 posts) = at most 21 Discord calls per hourly run
 
 const textResponse = (body, status = 200) => new Response(body, { status, headers: { 'content-type': 'text/plain; charset=utf-8' } });
 

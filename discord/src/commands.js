@@ -25,7 +25,14 @@ const DISCORD_EPOCH_MS = 1_420_070_400_000;
 const [SUB, STRING, INTEGER, CHANNEL] = [1, 3, 4, 7];
 const TEXT_CHANNEL = 0;
 const GUILD_TEXT_CHANNELS = [TEXT_CHANNEL, 5]; // text and announcement channels
-const WELCOME_TRIES = 3; // channels the install hello tries before giving up
+const WELCOME_TRIES = 5; // channels the install hello tries before giving up
+const VIEW_CHANNEL = 1n << 10n;
+const SEND_MESSAGES = 1n << 11n;
+
+// True when the channel's @everyone overwrite (its id is the guild id) denies viewing or sending.
+// ponytail: ignores role/member allows and the bot's own role; compute full permissions if picks still miss.
+const closedToEveryone = (channel, guildId) => (channel.permission_overwrites ?? [])
+  .some((o) => o.id === guildId && (BigInt(o.deny ?? 0) & (VIEW_CHANNEL | SEND_MESSAGES)) !== 0n);
 
 // One global command for server and personal installs, including DMs and group DMs.
 export const COMMANDS = [{
@@ -340,8 +347,8 @@ async function revealNow(env, i) {
 // ---- Install hello, setup, stats, recap ----------------------------------------------------------------------
 
 // The install hello (or `message`), posted once per install event: the server's system channel, else its text
-// channels in position order. Stops at the post that lands and gives up quietly after WELCOME_TRIES posts (a server
-// where Who's Bluffing may not write anywhere is fine). Returns the channel id, or null.
+// channels open to @everyone, in position order. Stops at the post that lands and gives up quietly after
+// WELCOME_TRIES posts (a server where Who's Bluffing may not write anywhere is fine). Returns the channel id, or null.
 export async function welcomeGuild(env, guildId, message = game.WELCOME) {
   const read = async (path) => {
     const res = await discord(env, 'GET', path);
@@ -356,7 +363,7 @@ export async function welcomeGuild(env, guildId, message = game.WELCOME) {
   if (system && (await post(system))) return system;
   const channels = await read(`/guilds/${guildId}/channels`);
   const text = (Array.isArray(channels) ? channels : [])
-    .filter((c) => c.type === TEXT_CHANNEL && c.id !== system)
+    .filter((c) => c.type === TEXT_CHANNEL && c.id !== system && !closedToEveryone(c, guildId))
     .sort((a, b) => a.position - b.position);
   for (const { id } of text) {
     if (tries >= WELCOME_TRIES) break;
